@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+<meta charset="utf-8">
+<title>DPDS LLM 分析报告 - T20260506CAF0754B</title>
+<style>
+  body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 40px; color: #333; line-height: 1.6; }
+  h1 { color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 12px; }
+  h2 { color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-top: 32px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #f5f5f5; font-weight: 600; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+  .stat-card { background: #f8f9fa; border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: bold; color: #1a73e8; }
+  .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
+  .conclusion-box { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 16px 0; border-left: 5px solid #388e3c; }
+  .llm-section { background: #fafbfc; border-radius: 8px; padding: 24px; margin: 16px 0; border: 1px solid #e8ecf0; }
+  .meta { color: #999; font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<h1>数据投毒检测 - LLM 深度分析报告</h1>
+
+<h2>1. 概览</h2>
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-value">309</div>
+    <div class="stat-label">可疑样本数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:#388e3c;">3.2%</div>
+    <div class="stat-label">综合风险分数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:#388e3c;font-size:20px;">低风险</div>
+    <div class="stat-label">风险等级</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">15,200</div>
+    <div class="stat-label">数据集样本总数</div>
+  </div>
+</div>
+
+<div class="conclusion-box">
+  <div style="font-size:18px;font-weight:bold;color:#388e3c;margin-bottom:8px;">
+    ✅ 低风险 — 检测结论
+  </div>
+  <p style="margin:0;">该数据集存在较低数据投毒风险
+  （综合风险分数 3.2%），共发现 309 个可疑样本
+  （约占 2.0%）。</p>
+</div>
+
+<h2>2. 数据集信息</h2>
+<table>
+  <tr><th>数据集名称</th><td>badedit_agnews</td></tr>
+  <tr><th>样本总数</th><td>15,200</td></tr>
+  <tr><th>标签字段</th><td>label</td></tr>
+  <tr><th>任务编号</th><td>T20260506CAF0754B</td></tr>
+  <tr><th>完成时间</th><td>2026-05-06 14:47:23</td></tr>
+</table>
+
+<h2>3. LLM 专业分析</h2>
+<div class="llm-section">
+<p style="margin:8px 0;line-height:1.8;">1. 【风险概述】：数据集badedit_agnews整体安全状况为低风险，综合风险分数仅3.16%，可疑样本占比2.03%（309个），且无多检测器交叉确认的样本，表明当前未发现明显的系统性数据投毒迹象。但孤立森林检测器识别出的309个异常样本中，包含66个高置信度（≥80%）样本，需警惕可能存在局部、隐蔽的投毒或标注错误。</p><p style="margin:8px 0;line-height:1.8;">2. 【深度分析】：基于孤立森林算法的异常检测结果，结合数据集为AG News文本分类任务的特征，可能的投毒攻击类型包括：①**标签翻转攻击**——通过将部分样本的标签恶意修改为错误类别，使模型学习错误关联，尤其高置信度异常样本可能对应此类操作；②**文本污染攻击**——在样本文本中插入无关或误导性词汇，扰乱特征分布，导致模型泛化能力下降；③**边界样本注入**——故意选取高难度边界样本进行投毒，使得模型分类边界偏移。当前检测器仅孤立森林单一点检出，未发现多检测器交叉命中，说明异常样本在分布上与正常样本有偏移但未形成明显聚类，攻击手法可能较为隐蔽、规模较小，尚未对整体数据集造成显著偏离。影响范围主要集中于这309个可疑样本（2.03%），若其中部分为投毒样本，在训练过程中可能诱导模型对特定模式产生偏差，降低对相关类别的分类准确率。</p><p style="margin:8px 0;line-height:1.8;">3. 【关键发现】：</p><p style="margin:8px 0;line-height:1.8;">- 共309个样本被标记为可疑，占总量2.03%，其中66个样本置信度高于80%，风险集中度较高。</p><p style="margin:8px 0;line-height:1.8;">- 所有可疑样本均由孤立森林检测器单一检出，其余检测器（若有）未交叉确认，说明异常特征提取方法单一，但检测器置信度分布体现了一定区分度。</p><p style="margin:8px 0;line-height:1.8;">- Top 10可疑样本置信度均达100%，建议优先人工复查，这些样本可能是典型的投毒载体或严重标注错误。</p><p style="margin:8px 0;line-height:1.8;">- 风险分解贡献值仅为0.004（归一化），表明该批次异常对整体风险分数影响微弱，但局部风险不容忽视。</p><p style="margin:8px 0;line-height:1.8;">4. 【处置建议】：</p><p style="margin:8px 0;line-height:1.8;">- **立即隔离高置信度样本**：将66个置信度≥80%的样本（包括Top 10中的100%样本）从训练集中提取出来，单独存放，暂停直接用于模型训练，等待人工核查。</p><p style="margin:8px 0;line-height:1.8;">- **开展人工复核**：指派数据标注审核人员重点抽查100%置信度的10个样本，检查其文本内容与原始标签是否一致，确认是否存在明显错误标签、恶意修改或无关文本插入。对于中置信度（50%-80%）的207个样本，可随机抽取20%进行抽样复核。</p><p style="margin:8px 0;line-height:1.8;">- **验证模型影响**：使用剔除可疑样本前后的数据集分别训练两个相同的基线模型（如BERT分类器），对比在验证集（尤其是对应类别）上的性能差异，量化异常样本对模型准确率或召回率的影响。</p><p style="margin:8px 0;line-height:1.8;">- **更新异常检测标记**：根据人工复核结果，将确认的投毒样本标记为“毒化”，并移入隔离库；确认是正常边界样本的则解除标记，放回训练集。</p><p style="margin:8px 0;line-height:1.8;">5. 【后续防护】：</p><p style="margin:8px 0;line-height:1.8;">- **引入多检测器交叉验证**：当前仅使用孤立森林，建议增加基于特征统计（如Z-score）、基于模型不确定性（如Dropout Monte Carlo）以及基于邻居分布（如LOF）的检测器，形成多角度验证，降低漏报与误报。</p><p style="margin:8px 0;line-height:1.8;">- **建立数据投毒监控基线**：定期（如每次新数据入库时）运行上述检测流程，记录异常样本比例、置信度分布及多检测器命中率变化，及早发现攻击趋势。</p><p style="margin:8px 0;line-height:1.8;">- **加强标注流程管控**：对标注任务引入“黄金样本”校验机制，预设少量已知标签的样本混入标注任务，通过比对标注结果识别异常标注行为。</p><p style="margin:8px 0;line-height:1.8;">- **实施增量防御训练**：在模型训练中引入对抗训练或数据清洗预处理步骤（如基于置信度的样本加权），降低投毒样本对梯度更新的影响。</p><p style="margin:8px 0;line-height:1.8;">- **完善应急响应预案**：当综合风险分数连续两次高于5%或单个检测器异常样本比例超过3%时，自动触发数据暂停使用、人工复核与模型回滚流程。</p>
+</div>
+
+<h2>4. 高风险样本（Top 20）</h2>
+<table>
+  <tr><th>样本 ID</th><th>风险类型</th><th>置信度</th><th>检测器</th><th>处理建议</th></tr>
+  <tr><td>S-011976</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-007606</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-010186</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-012729</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-014174</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-006594</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-004351</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-010709</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-005181</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-009354</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-002754</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-013906</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-005129</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-012781</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-002586</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-006306</td><td>异常样本</td><td>100.0%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-010655</td><td>异常样本</td><td>99.8%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-008749</td><td>异常样本</td><td>99.1%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-009674</td><td>异常样本</td><td>99.1%</td><td>isolation_forest</td><td>人工复查</td></tr>
+<tr><td>S-007960</td><td>异常样本</td><td>99.1%</td><td>isolation_forest</td><td>人工复查</td></tr>
+
+</table>
+
+<p class="meta">
+  报告生成时间：2026-05-06 22:47:59 | DPDS 数据投毒检测系统<br>
+  本报告由 LLM（deepseek-v4-flash）辅助生成，建议结合人工审查做出最终决策。
+</p>
+</body>
+</html>

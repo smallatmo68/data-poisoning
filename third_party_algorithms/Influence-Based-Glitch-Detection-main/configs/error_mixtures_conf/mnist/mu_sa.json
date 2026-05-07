@@ -1,0 +1,12 @@
+[
+  {
+    "error": "mislabelled_uniform",
+    "contamination": 0.01,
+    "seed": 0
+  },
+  {
+    "error": "supervised_anomalies",
+    "contamination": 0.01,
+    "seed": 1
+  }
+]

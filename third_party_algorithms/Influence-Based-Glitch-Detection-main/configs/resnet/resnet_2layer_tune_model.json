@@ -1,0 +1,5 @@
+{
+  "name": "resnet20",
+  "trainable_layers": ["layer3.2"],
+  "random_seed": 42
+}

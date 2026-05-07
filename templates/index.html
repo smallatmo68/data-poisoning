@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPDS - 数据投毒识别与防御系统</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/css/vendor/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+    <style>
+/* ════════════════════════════════════════════════════════════
+   DPDS 全局样式 - 科技蓝深色主题
+════════════════════════════════════════════════════════════ */
+:root {
+    --bg-dark: #0a0e1a;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2332;
+    --bg-sidebar: #0d1117;
+    --bg-header: rgba(17, 24, 39, 0.95);
+    --bg-input: #1e293b;
+    --border: #1e293b;
+    --border-light: #2d3a4f;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-glow: rgba(59, 130, 246, 0.3);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #06b6d4;
+    --purple: #8b5cf6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-dark); color: var(--text-primary); line-height: 1.6;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+/* ── 登录页 ── */
+.login-page {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f172a 40%, #1e1b4b 100%);
+    position: relative; overflow: hidden;
+}
+.login-page::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    animation: bgPulse 8s ease-in-out infinite alternate;
+}
+@keyframes bgPulse { to { transform: translate(2%, -2%); } }
+.login-box {
+    position: relative; z-index: 1; width: 420px; background: rgba(17,24,39,0.85);
+    backdrop-filter: blur(20px); border: 1px solid var(--border-light); border-radius: 16px;
+    padding: 48px 40px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.login-brand { text-align: center; margin-bottom: 36px; }
+.login-icon {
+    width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+}
+.login-brand h1 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: 1px; }
+.login-brand p { font-size: 13px; color: var(--text-muted); letter-spacing: 2px; }
+
+/* ── 主布局 ── */
+.app-layout { display: flex; height: 100vh; overflow: hidden; }
+.sidebar {
+    width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
+}
+.sidebar-brand {
+    height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 20px;
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.sidebar-brand-icon {
+    width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-brand-text { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+.sidebar-brand-sub { font-size: 10px; color: var(--text-muted); display: block; margin-top: -2px; letter-spacing: 0.5px; }
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+.nav-group-label {
+    font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1px; padding: 16px 20px 8px; margin-top: 4px;
+}
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 20px; margin: 2px 8px;
+    border-radius: 8px; cursor: pointer; transition: all .2s; color: var(--text-secondary);
+    font-size: 14px; text-decoration: none;
+}
+.nav-item:hover { background: rgba(59,130,246,0.08); color: var(--text-primary); }
+.nav-item.active {
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.1));
+    color: var(--accent); font-weight: 600; border: 1px solid rgba(59,130,246,0.2);
+}
+.nav-item .el-icon { font-size: 18px; flex-shrink: 0; }
+.sidebar-footer {
+    padding: 16px 20px; border-top: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; }
+.sidebar-footer .avatar {
+    width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; font-weight: 600;
+}
+
+/* ── 主内容区 ── */
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.main-header {
+    height: 64px; background: var(--bg-header); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); display: flex; align-items: center;
+    justify-content: space-between; padding: 0 28px; flex-shrink: 0;
+}
+.main-header h2 { font-size: 18px; font-weight: 600; color: #fff; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.main-content { flex: 1; overflow-y: auto; padding: 24px 28px; background: var(--bg-dark); }
+
+/* ── 通用卡片 ── */
+.dp-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; margin-bottom: 20px; transition: border-color .2s;
+}
+.dp-card:hover { border-color: var(--border-light); }
+.dp-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.dp-card-title { font-size: 15px; font-weight: 600; color: #fff; }
+
+/* ── 统计卡片 ── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; display: flex; align-items: center; gap: 16px; transition: all .3s;
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.stat-icon {
+    width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+}
+.stat-value { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── 快捷入口 ── */
+.quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.quick-action {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px 16px; text-align: center; cursor: pointer; transition: all .3s;
+}
+.quick-action:hover { border-color: var(--accent); background: var(--bg-card-hover); transform: translateY(-2px); }
+.quick-action .el-icon { font-size: 28px; color: var(--accent); margin-bottom: 8px; }
+.quick-action-label { font-size: 13px; color: var(--text-secondary); }
+
+/* ── 检测器选择 ── */
+.detector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detector-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; cursor: pointer; transition: all .2s;
+}
+.detector-card:hover { border-color: var(--border-light); }
+.detector-card.selected { border-color: var(--accent); background: rgba(59,130,246,0.08);
+    box-shadow: 0 0 0 1px var(--accent); }
+.detector-card.disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── 数据集卡片 ── */
+.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.ds-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; transition: all .3s; display: flex; flex-direction: column;
+}
+.ds-card:hover { border-color: var(--accent); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+/* ── 步骤条 ── */
+.step-content { max-width: 720px; margin: 0 auto; padding: 20px 0; }
+
+/* ── 风险色 ── */
+.risk-high { color: var(--danger); }
+.risk-medium { color: var(--warning); }
+.risk-low { color: var(--success); }
+
+/* ── 分析图表 ── */
+.analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.chart-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+}
+.chart-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.hbar-row { margin-bottom: 12px; }
+.hbar-label { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.hbar-name { font-size: 12px; color: var(--text-secondary); }
+.hbar-val { font-size: 11px; color: var(--text-muted); }
+.hbar-track { height: 8px; background: var(--bg-input); border-radius: 4px; overflow: hidden; }
+.hbar-fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
+
+/* ── 置信度直方图 ── */
+.hist-wrap { display: flex; gap: 10px; align-items: flex-end; height: 120px; }
+.hist-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    height: 100%; justify-content: flex-end; }
+.hist-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height .8s ease; }
+.hist-count { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+.hist-range { font-size: 10px; color: var(--text-muted); }
+
+/* ── 结论框 ── */
+.conclusion-box { border-radius: 10px; padding: 20px; margin: 16px 0; border-left: 4px solid; }
+.conclusion-high { background: rgba(239,68,68,0.08); border-color: var(--danger); }
+.conclusion-medium { background: rgba(245,158,11,0.08); border-color: var(--warning); }
+.conclusion-low { background: rgba(16,185,129,0.08); border-color: var(--success); }
+
+/* ── 进度动画 ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinning { animation: spin 1.2s linear infinite; display: inline-block; }
+
+/* ── 空状态 ── */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state .el-icon { font-size: 56px; color: var(--text-muted); margin-bottom: 16px; }
+.empty-state p { color: var(--text-muted); font-size: 14px; }
+
+/* ── Element Plus 主题覆盖 ── */
+.el-input__wrapper { background: var(--bg-input) !important; border: 1px solid var(--border) !important;
+    box-shadow: none !important; }
+.el-input__wrapper:hover { border-color: var(--border-light) !important; }
+.el-input__wrapper.is-focus { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent-glow) !important; }
+.el-input__inner { color: var(--text-primary) !important; }
+.el-input__inner::placeholder { color: var(--text-muted) !important; }
+.el-textarea__inner { background: var(--bg-input) !important; border-color: var(--border) !important;
+    color: var(--text-primary) !important; }
+.el-textarea__inner:focus { border-color: var(--accent) !important; }
+.el-select .el-input__wrapper { background: var(--bg-input) !important; }
+.el-dialog { background: var(--bg-card) !important; border: 1px solid var(--border); border-radius: 12px; }
+.el-dialog__header { border-bottom: 1px solid var(--border); padding: 16px 20px !important; }
+.el-dialog__title { color: #fff !important; }
+.el-dialog__body { padding: 20px !important; color: var(--text-primary); }
+.el-dialog__headerbtn .el-dialog__close { color: var(--text-muted) !important; }
+.el-table { --el-table-bg-color: var(--bg-card); --el-table-tr-bg-color: var(--bg-card);
+    --el-table-header-bg-color: var(--bg-input); --el-table-border-color: var(--border);
+    --el-table-text-color: var(--text-primary); --el-table-header-text-color: var(--text-secondary);
+    --el-table-row-hover-bg-color: var(--bg-card-hover); }
+.el-table th.el-table__cell { background: var(--bg-input) !important; }
+.el-descriptions { --el-descriptions-item-bordered-label-background: var(--bg-input); }
+.el-step__title { color: var(--text-muted) !important; }
+.el-step__title.is-process { color: var(--accent) !important; }
+.el-step__title.is-finish { color: var(--success) !important; }
+.el-step__head.is-process { color: var(--accent) !important; border-color: var(--accent) !important; }
+.el-step__head.is-finish { color: var(--success) !important; border-color: var(--success) !important; }
+.el-step__line { background-color: var(--border) !important; }
+.el-upload-dragger { background: var(--bg-input) !important; border-color: var(--border) !important; }
+.el-upload-dragger:hover { border-color: var(--accent) !important; }
+.el-radio-button__inner { background: var(--bg-input) !important; border-color: var(--border) !important;
+    color: var(--text-secondary) !important; }
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+    background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
+.el-menu { border-right: none !important; }
+.el-form-item__label { color: var(--text-secondary) !important; }
+.el-divider__text { background: var(--bg-card) !important; color: var(--text-muted) !important; }
+.el-divider { border-color: var(--border) !important; }
+.el-page-header__back { color: var(--text-secondary) !important; }
+.el-page-header__title { color: var(--text-primary) !important; }
+.el-descriptions__label { color: var(--text-muted) !important; }
+.el-descriptions__content { color: var(--text-primary) !important; }
+.el-progress-bar__outer { background: var(--bg-input) !important; }
+.el-alert { background: var(--bg-input) !important; border-color: var(--border) !important; }
+.el-alert__title { color: var(--text-primary) !important; }
+.el-alert__description { color: var(--text-secondary) !important; }
+.el-message-box { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-message-box__title { color: #fff !important; }
+.el-message-box__message { color: var(--text-primary) !important; }
+.el-message-box__btns .el-button { background: var(--bg-input) !important; border-color: var(--border) !important; }
+.el-pagination { --el-pagination-bg-color: var(--bg-card); --el-pagination-text-color: var(--text-secondary);
+    --el-pagination-button-bg-color: var(--bg-input); }
+.el-pagination button { background: var(--bg-input) !important; color: var(--text-secondary) !important; }
+.el-pager li { background: var(--bg-input) !important; color: var(--text-secondary) !important; }
+.el-pager li.is-active { background: var(--accent) !important; color: #fff !important; }
+.el-select-dropdown { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-select-dropdown__item { color: var(--text-primary) !important; }
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover { background: var(--bg-card-hover) !important; }
+.el-select-dropdown__item.is-selected { color: var(--accent) !important; font-weight: 600; }
+.el-popper { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-popper.is-light .el-popper__arrow::before { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-tag { border-color: transparent !important; }
+.el-form-item { margin-bottom: 20px; }
+.el-upload-list__item .el-icon--close { color: var(--text-muted) !important; }
+.el-upload-list__item-name { color: var(--text-secondary) !important; }
+.el-switch__label { color: var(--text-secondary) !important; }
+.el-checkbox__label { color: var(--text-secondary) !important; }
+.el-checkbox__input.is-checked .el-checkbox__inner { background-color: var(--accent) !important; border-color: var(--accent) !important; }
+.el-radio__label { color: var(--text-secondary) !important; }
+.el-radio__input.is-checked .el-radio__inner { background-color: var(--accent) !important; border-color: var(--accent) !important; }
+.el-collapse-item__header { background: var(--bg-input) !important; color: var(--text-primary) !important; border-color: var(--border) !important; }
+.el-collapse-item__wrap { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-collapse-item__content { color: var(--text-primary) !important; }
+.el-card { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-card__header { border-color: var(--border) !important; color: var(--text-primary) !important; }
+.el-tabs__item { color: var(--text-muted) !important; }
+.el-tabs__item.is-active { color: var(--accent) !important; }
+.el-tabs__nav-wrap::after { background: var(--border) !important; }
+.el-tooltip__popper { background: var(--bg-card) !important; border: 1px solid var(--border) !important; color: var(--text-primary) !important; }
+.el-notification { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-notification__title { color: #fff !important; }
+.el-notification__content { color: var(--text-secondary) !important; }
+.el-message { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-message__content { color: var(--text-primary) !important; }
+.el-overlay { background: rgba(0,0,0,0.6) !important; }
+.el-drawer { background: var(--bg-card) !important; }
+.el-drawer__header { color: #fff !important; border-color: var(--border) !important; }
+.el-popover { background: var(--bg-card) !important; border-color: var(--border) !important; color: var(--text-primary) !important; }
+.el-dropdown-menu { background: var(--bg-card) !important; border-color: var(--border) !important; }
+.el-dropdown-menu__item { color: var(--text-primary) !important; }
+.el-dropdown-menu__item:hover { background: var(--bg-card-hover) !important; color: var(--accent) !important; }
+.el-loading-mask { background: rgba(10,14,26,0.7) !important; }
+.el-loading-spinner .el-loading-text { color: var(--text-secondary) !important; }
+.el-loading-spinner .circular .path { stroke: var(--accent) !important; }
+
+/* ── 样本详情对话框 ── */
+.sample-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sample-data-table { max-height: 300px; overflow-y: auto; }
+.sample-data-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.sample-data-table th, .sample-data-table td { padding: 6px 10px; border: 1px solid var(--border); text-align: left; }
+.sample-data-table th { background: var(--bg-input); color: var(--text-secondary); font-weight: 600; position: sticky; top: 0; }
+.sample-data-table td { color: var(--text-primary); }
+
+/* ── LLM 报告内容 ── */
+.llm-content { background: var(--bg-input); border-radius: 8px; padding: 20px; margin: 12px 0;
+    border-left: 3px solid var(--accent); line-height: 1.8; color: var(--text-primary); }
+.llm-content h3 { color: var(--accent); margin: 16px 0 8px; font-size: 15px; }
+.llm-content p { margin: 8px 0; }
+
+/* 响应式 */
+@media (max-width: 1200px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 960px) { .analysis-grid { grid-template-columns: 1fr; } }
+
+/* ════════════════════════════════════════════════════════════
+   强制深色覆盖 — 消灭所有白色残留
+════════════════════════════════════════════════════════════ */
+html, body, #app {
+    background: #070b16 !important;
+    color: #e5edf7 !important;
+}
+
+/* 原生表格强制深色 */
+table, thead, tbody, tr, th, td {
+    background-color: transparent !important;
+    color: #e5edf7 !important;
+    border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+/* Element Plus 表格全面覆盖 */
+.el-table, .el-table__inner-wrapper, .el-table__header-wrapper,
+.el-table__body-wrapper, .el-table__footer-wrapper,
+.el-table th.el-table__cell, .el-table tr, .el-table td.el-table__cell,
+.el-table__expanded-cell, .el-table__body, .el-table__header {
+    background-color: #101827 !important;
+    color: #e5edf7 !important;
+}
+.el-table__row:nth-child(odd) td.el-table__cell {
+    background-color: #101827 !important;
+}
+.el-table__row:nth-child(even) td.el-table__cell {
+    background-color: #0c1322 !important;
+}
+.el-table__row:hover > td.el-table__cell,
+.el-table__row.current-row > td.el-table__cell,
+.el-table__row.hover-row > td.el-table__cell {
+    background-color: #17233a !important;
+}
+.el-table__empty-block, .el-table__empty-text {
+    background-color: #101827 !important;
+    color: #94a3b8 !important;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+    background-color: #0c1322 !important;
+}
+.el-table__fixed, .el-table__fixed-right, .el-table__fixed-body-wrapper {
+    background-color: #101827 !important;
+}
+
+/* 输入框、选择器、文本域 */
+.el-input__wrapper, .el-textarea__inner, .el-select__wrapper,
+input, select, textarea {
+    background-color: #111827 !important;
+    color: #e5edf7 !important;
+    border-color: rgba(148, 163, 184, 0.25) !important;
+    box-shadow: none !important;
+}
+.el-input__inner, .el-textarea__inner {
+    color: #e5edf7 !important;
+}
+
+/* 弹窗、卡片、下拉 */
+.el-dialog, .el-dialog__body, .el-dialog__header, .el-dialog__title,
+.el-card, .el-card__header, .el-card__body,
+.el-popper, .el-dropdown-menu,
+.el-select-dropdown, .el-select-dropdown__item,
+.el-message-box, .el-notification, .el-message {
+    background-color: #101827 !important;
+    color: #e5edf7 !important;
+    border-color: rgba(148, 163, 184, 0.18) !important;
+}
+.el-dialog__title, .el-card__header { color: #fff !important; }
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover,
+.el-dropdown-menu__item:hover {
+    background-color: #17233a !important;
+}
+
+/* 按钮 */
+.el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--danger):not(.el-button--warning):not(.el-button--info) {
+    background-color: #152238 !important;
+    color: #e5edf7 !important;
+    border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+/* 描述列表 */
+.el-descriptions { --el-descriptions-item-bordered-label-background: #111827 !important; }
+.el-descriptions__label { color: #94a3b8 !important; background: #111827 !important; }
+.el-descriptions__content { color: #e5edf7 !important; background: #101827 !important; }
+.el-descriptions-item__label, .el-descriptions-item__content {
+    background-color: #111827 !important;
+    color: #e5edf7 !important;
+    border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+/* 分页 */
+.el-pagination { --el-pagination-bg-color: #101827; --el-pagination-text-color: #94a3b8;
+    --el-pagination-button-bg-color: #152238; }
+.el-pagination button, .el-pager li {
+    background-color: #152238 !important; color: #94a3b8 !important;
+}
+.el-pager li.is-active { background-color: #3b82f6 !important; color: #fff !important; }
+
+/* 步骤条 */
+.el-step__title { color: #94a3b8 !important; }
+.el-step__title.is-process { color: #3b82f6 !important; }
+.el-step__title.is-finish { color: #10b981 !important; }
+.el-step__head { color: #94a3b8 !important; border-color: #1e293b !important; }
+.el-step__head.is-process { color: #3b82f6 !important; border-color: #3b82f6 !important; }
+.el-step__head.is-finish { color: #10b981 !important; border-color: #10b981 !important; }
+.el-step__line { background-color: #1e293b !important; }
+
+/* 标签页 */
+.el-tabs__item { color: #64748b !important; }
+.el-tabs__item.is-active { color: #3b82f6 !important; }
+.el-tabs__nav-wrap::after { background: #1e293b !important; }
+.el-tabs__header { background: transparent !important; }
+
+/* 加载遮罩 */
+.el-loading-mask { background: rgba(7, 11, 22, 0.7) !important; }
+.el-loading-spinner .el-loading-text { color: #94a3b8 !important; }
+.el-loading-spinner .circular .path { stroke: #3b82f6 !important; }
+
+/* 进度条 */
+.el-progress-bar__outer { background: #1e293b !important; }
+
+/* 折叠面板 */
+.el-collapse-item__header { background: #111827 !important; color: #e5edf7 !important; border-color: #1e293b !important; }
+.el-collapse-item__wrap { background: #101827 !important; border-color: #1e293b !important; }
+.el-collapse-item__content { color: #e5edf7 !important; }
+
+/* 表单标签 */
+.el-form-item__label { color: #94a3b8 !important; }
+
+/* 开关、复选框、单选框 */
+.el-switch__label { color: #94a3b8 !important; }
+.el-checkbox__label { color: #94a3b8 !important; }
+.el-radio__label { color: #94a3b8 !important; }
+
+/* 滚动条 */
+* { scrollbar-color: #334155 #0f172a; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* 覆盖任何遗漏的白色 */
+[class*="el-"] {
+    --el-bg-color: #101827;
+    --el-bg-color-overlay: #101827;
+    --el-bg-color-page: #070b16;
+    --el-text-color-primary: #e5edf7;
+    --el-text-color-regular: #c9d1d9;
+    --el-text-color-secondary: #94a3b8;
+    --el-text-color-placeholder: #64748b;
+    --el-border-color: #1e293b;
+    --el-border-color-light: #2d3a4f;
+    --el-border-color-lighter: #334155;
+    --el-fill-color: #111827;
+    --el-fill-color-light: #152238;
+    --el-fill-color-lighter: #1a2332;
+    --el-fill-color-blank: #101827;
+    --el-mask-color: rgba(7, 11, 22, 0.8);
+}
+    </style>
+</head>
+<body>
+{% verbatim %}
+<div id="app">
+
+<!-- ═══════════════════════════════════════════════════════
+     登录页
+═══════════════════════════════════════════════════════ -->
+<div v-if="!isLoggedIn" class="login-page">
+    <div class="login-box">
+        <div class="login-brand">
+            <div class="login-icon">
+                <el-icon :size="36" color="#fff"><shield /></el-icon>
+            </div>
+            <h1>DPDS</h1>
+            <p>数据投毒识别与防御系统</p>
+        </div>
+        <el-form @submit.prevent="login">
+            <el-form-item>
+                <el-input v-model="loginForm.username" placeholder="请输入用户名" size="large" clearable
+                    @keyup.enter="login" prefix-icon="user" />
+            </el-form-item>
+            <el-form-item>
+                <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" size="large"
+                    show-password @keyup.enter="login" prefix-icon="lock" />
+            </el-form-item>
+            <el-alert v-if="loginErr" :title="loginErr" type="error" :closable="false" show-icon
+                style="margin-bottom:16px;" />
+            <el-form-item style="margin-bottom:0;">
+                <el-button type="primary" size="large" style="width:100%;height:44px;font-size:15px;"
+                    :loading="loading.auth" @click="login">
+                    登 录 系 统
+                </el-button>
+            </el-form-item>
+        </el-form>
+        <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted);">
+            测试账号: admin / admin123 (管理员) &nbsp;|&nbsp; user / user123 (普通用户)
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     主界面
+═══════════════════════════════════════════════════════ -->
+<div v-else class="app-layout">
+
+    <!-- ── 侧边栏 ── -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <el-icon :size="20" color="#fff"><shield /></el-icon>
+            </div>
+            <div>
+                <span class="sidebar-brand-text">DPDS</span>
+                <span class="sidebar-brand-sub">数据投毒防御系统</span>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-group-label">工作空间</div>
+            <div class="nav-item" :class="{active: page==='dashboard'}" @click="page='dashboard'">
+                <el-icon><odometer /></el-icon><span>工作台</span>
+            </div>
+            <div class="nav-item" :class="{active: page==='submit'}" @click="page='submit'">
+                <el-icon><upload-filled /></el-icon><span>提交检测</span>
+            </div>
+
+            <div class="nav-group-label">数据管理</div>
+            <div class="nav-item" :class="{active: page==='datasets'}" @click="page='datasets'">
+                <el-icon><folder /></el-icon><span>数据集管理</span>
+            </div>
+
+            <div class="nav-group-label">检测与防御</div>
+            <div class="nav-item" :class="{active: page==='tasks'}" @click="page='tasks'">
+                <el-icon><list /></el-icon><span>检测任务</span>
+            </div>
+            <div class="nav-item" :class="{active: page==='reports'}" @click="page='reports'">
+                <el-icon><data-analysis /></el-icon><span>检测报告</span>
+            </div>
+            <div class="nav-item" :class="{active: page==='defense'}" @click="page='defense'">
+                <el-icon><brush /></el-icon><span>数据无害化</span>
+            </div>
+            <div class="nav-item" :class="{active: page==='report-center'}" @click="page='report-center'">
+                <el-icon><document /></el-icon><span>报告中心</span>
+            </div>
+
+            <div class="nav-group-label">系统设置</div>
+            <div class="nav-item" :class="{active: page==='methods'}" @click="page='methods'">
+                <el-icon><setting /></el-icon><span>检测算法</span>
+            </div>
+            <template v-if="user && user.is_staff">
+                <div class="nav-group-label">管理后台</div>
+                <div class="nav-item" :class="{active: page==='admin'}" @click="page='admin'">
+                    <el-icon><monitor /></el-icon><span>系统概览</span>
+                </div>
+                <div class="nav-item" :class="{active: page==='users'}" @click="page='users'">
+                    <el-icon><user /></el-icon><span>用户管理</span>
+                </div>
+                <div class="nav-item" :class="{active: page==='logs'}" @click="page='logs'">
+                    <el-icon><tickets /></el-icon><span>审计日志</span>
+                </div>
+            </template>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">{{ (user?.username || '?')[0].toUpperCase() }}</div>
+                <div>
+                    <div style="font-size:13px;color:#fff;font-weight:500;">{{ user?.username }}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">{{ user?.is_staff ? '管理员' : '分析师' }}</div>
+                </div>
+            </div>
+            <el-button link style="color:var(--text-muted);" @click="logout">
+                <el-icon><switch-button /></el-icon>
+            </el-button>
+        </div>
+    </div>
+
+    <!-- ── 主内容 ── -->
+    <div class="main-area">
+        <div class="main-header">
+            <h2>{{ pageTitle }}</h2>
+            <div class="header-right">
+                <el-tag type="success" size="small" effect="dark">系统运行中</el-tag>
+                <span style="font-size:13px;color:var(--text-secondary);">{{ user?.username }}</span>
+            </div>
+        </div>
+        <div class="main-content">
+
+<!-- ═══════════════════════════════════════
+     工作台 Dashboard
+═══════════════════════════════════════ -->
+<div v-if="page === 'dashboard'">
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(59,130,246,0.15);">
+                <el-icon :size="24" color="var(--accent)"><folder /></el-icon>
+            </div>
+            <div>
+                <div class="stat-value">{{ dashStats.total_datasets }}</div>
+                <div class="stat-label">数据集总数</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(139,92,246,0.15);">
+                <el-icon :size="24" color="var(--purple)"><cpu /></el-icon>
+            </div>
+            <div>
+                <div class="stat-value">{{ dashStats.total_tasks }}</div>
+                <div class="stat-label">检测任务数</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(239,68,68,0.15);">
+                <el-icon :size="24" color="var(--danger)"><warning /></el-icon>
+            </div>
+            <div>
+                <div class="stat-value" style="color:var(--danger);">{{ dashStats.high_risk }}</div>
+                <div class="stat-label">高风险任务</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.15);">
+                <el-icon :size="24" color="var(--success)"><document /></el-icon>
+            </div>
+            <div>
+                <div class="stat-value">{{ dashStats.total_reports }}</div>
+                <div class="stat-label">生成报告</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <div class="quick-action" @click="page='submit'">
+            <el-icon><upload-filled /></el-icon>
+            <div class="quick-action-label">提交新检测</div>
+        </div>
+        <div class="quick-action" @click="page='datasets'">
+            <el-icon><folder-add /></el-icon>
+            <div class="quick-action-label">导入数据集</div>
+        </div>
+        <div class="quick-action" @click="page='tasks'">
+            <el-icon><list /></el-icon>
+            <div class="quick-action-label">查看任务</div>
+        </div>
+        <div class="quick-action" @click="page='reports'">
+            <el-icon><data-analysis /></el-icon>
+            <div class="quick-action-label">查看报告</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="dp-card">
+            <div class="dp-card-header">
+                <span class="dp-card-title">最近检测任务</span>
+                <el-button link type="primary" size="small" @click="page='tasks'">查看全部</el-button>
+            </div>
+            <div v-if="!tasks.length" class="empty-state" style="padding:30px 0;">
+                <p>暂无检测任务</p>
+            </div>
+            <div v-else>
+                <div v-for="t in tasks.slice(0, 5)" :key="t.task_id"
+                    style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                        <div style="font-size:13px;color:#fff;">{{ t.task_no }}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">{{ getDatasetName(t.dataset) }}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <el-tag :type="statusType(t.status)" size="small" effect="dark">{{ statusLabel(t.status) }}</el-tag>
+                        <span v-if="t.risk_score!=null" style="font-size:12px;font-weight:600;"
+                            :style="{color:riskColor(t.risk_score)}">{{ (t.risk_score*100).toFixed(1) }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dp-card">
+            <div class="dp-card-header">
+                <span class="dp-card-title">风险等级分布</span>
+            </div>
+            <div v-if="dashStats.high_risk || dashStats.medium_risk || dashStats.low_risk">
+                <div class="hbar-row">
+                    <div class="hbar-label">
+                        <span class="hbar-name" style="color:var(--danger);">高风险</span>
+                        <span class="hbar-val">{{ dashStats.high_risk }} 个任务</span>
+                    </div>
+                    <div class="hbar-track">
+                        <div class="hbar-fill" :style="{width: riskBarWidth(dashStats.high_risk)+'%', background:'var(--danger)'}"></div>
+                    </div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">
+                        <span class="hbar-name" style="color:var(--warning);">中风险</span>
+                        <span class="hbar-val">{{ dashStats.medium_risk }} 个任务</span>
+                    </div>
+                    <div class="hbar-track">
+                        <div class="hbar-fill" :style="{width: riskBarWidth(dashStats.medium_risk)+'%', background:'var(--warning)'}"></div>
+                    </div>
+                </div>
+                <div class="hbar-row">
+                    <div class="hbar-label">
+                        <span class="hbar-name" style="color:var(--success);">低风险</span>
+                        <span class="hbar-val">{{ dashStats.low_risk }} 个任务</span>
+                    </div>
+                    <div class="hbar-track">
+                        <div class="hbar-fill" :style="{width: riskBarWidth(dashStats.low_risk)+'%', background:'var(--success)'}"></div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="empty-state" style="padding:30px 0;">
+                <p>暂无风险数据</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     提交检测
+═══════════════════════════════════════ -->
+<div v-if="page === 'submit'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">提交数据集进行安全检测</span>
+        </div>
+
+        <el-steps :active="step" align-center style="margin-bottom:32px;">
+            <el-step title="准备数据集" />
+            <el-step title="选择检测算法" />
+            <el-step title="确认提交" />
+        </el-steps>
+
+        <!-- Step 0: 准备数据集 -->
+        <div v-show="step === 0" class="step-content">
+            <el-radio-group v-model="submitForm.sourceType" style="margin-bottom:20px;">
+                <el-radio-button label="upload">上传新数据集</el-radio-button>
+                <el-radio-button label="existing">使用已有数据集</el-radio-button>
+            </el-radio-group>
+
+            <!-- 上传新数据集 -->
+            <template v-if="submitForm.sourceType === 'upload'">
+                <el-upload :auto-upload="false" :limit="1" accept=".csv,.tsv"
+                    :on-change="handleFileChange" drag style="margin-bottom:16px;"
+                    :file-list="uploadFile ? [{name: uploadFile.name}] : []">
+                    <el-icon :size="40" style="color:var(--text-muted);"><upload-filled /></el-icon>
+                    <div style="margin-top:8px;color:var(--text-secondary);">拖拽 CSV 文件到此处，或<em style="color:var(--accent);">点击选择</em></div>
+                    <template #tip><div style="font-size:12px;color:var(--text-muted);">支持 .csv / .tsv，最大 2GB</div></template>
+                </el-upload>
+                <el-input v-model="submitForm.datasetName" placeholder="数据集名称（可选）"
+                    style="margin-bottom:16px;" clearable />
+                <div v-if="uploadStatus" style="margin-bottom:16px;">
+                    <el-alert :title="uploadStatus" :type="uploadStatusType" :closable="false" show-icon />
+                </div>
+                <el-button type="primary" :loading="loading.upload" :disabled="!uploadFile" @click="doUpload">
+                    上传并继续
+                </el-button>
+            </template>
+
+            <!-- 使用已有数据集 -->
+            <template v-else>
+                <el-select v-model="submitForm.existingId" placeholder="请选择数据集"
+                    filterable style="width:100%;margin-bottom:16px;"
+                    @change="onExistingDatasetChange">
+                    <el-option v-for="ds in datasets" :key="ds.id"
+                        :label="`${ds.dataset_name}（${(ds.sample_count||0).toLocaleString()} 条）`"
+                        :value="ds.id" />
+                </el-select>
+                <div v-if="submitForm.existingId" style="margin-bottom:16px;">
+                    <div v-if="getDatasetById(submitForm.existingId)?.status === 'ready'" style="color:var(--success);font-size:13px;">
+                        数据集已就绪，可以进行检测
+                    </div>
+                    <div v-else-if="getDatasetById(submitForm.existingId)?.status === 'parsing'" style="color:var(--warning);font-size:13px;">
+                        数据集正在解析中，请稍候
+                    </div>
+                    <div v-else style="color:var(--danger);font-size:13px;">
+                        数据集状态异常: {{ getDatasetById(submitForm.existingId)?.status }}
+                    </div>
+                </div>
+                <el-button type="primary" :disabled="!submitForm.existingId || getDatasetById(submitForm.existingId)?.status !== 'ready'"
+                    @click="useExistingDataset">
+                    下一步：选择检测算法
+                </el-button>
+            </template>
+        </div>
+
+        <!-- Step 1: 选择检测算法 -->
+        <div v-show="step === 1" class="step-content">
+            <div style="margin-bottom:16px;padding:12px;background:var(--bg-input);border-radius:8px;border-left:3px solid var(--accent);">
+                <span style="font-size:13px;color:var(--text-secondary);">已选数据集：</span>
+                <strong style="color:#fff;">{{ getDatasetName(uploadedId) }}</strong>
+                <el-tag type="success" size="small" effect="dark" style="margin-left:8px;">就绪</el-tag>
+            </div>
+            <p style="color:var(--text-secondary);margin-bottom:16px;">选择要运行的检测算法（可多选）：</p>
+            <div v-if="loading.detectors" style="text-align:center;padding:40px 0;">
+                <el-icon class="spinning" :size="28" style="color:var(--accent);"><loading /></el-icon>
+                <div style="margin-top:10px;color:var(--text-muted);">加载检测算法...</div>
+            </div>
+            <div v-else class="detector-grid">
+                <div v-for="m in detectors" :key="m.detector_name"
+                    class="detector-card" :class="{selected: submitForm.detectors.includes(m.detector_name), disabled: !m.enabled}"
+                    @click="m.enabled && toggleDetector(m.detector_name)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-weight:600;font-size:14px;color:#fff;">{{ m.display_name || m.detector_name }}</span>
+                        <el-tag :type="detectorTypeTag(m.detector_type)" size="small" effect="dark">{{ detectorTypeLabel(m.detector_type) }}</el-tag>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">{{ m.description || '暂无描述' }}</div>
+                    <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap;">
+                        <el-tag v-if="m.requires_baseline" type="warning" size="small">需基准数据集</el-tag>
+                        <el-tag v-if="!m.enabled" type="info" size="small">暂不可用</el-tag>
+                        <el-tag v-if="submitForm.detectors.includes(m.detector_name)" type="success" size="small">已选</el-tag>
+                    </div>
+                </div>
+            </div>
+            <div v-if="selectedRequiresBaseline" style="margin-top:16px;">
+                <el-alert title="所选算法需要基准数据集用于分布比较" type="warning" :closable="false" show-icon style="margin-bottom:12px;" />
+                <el-select v-model="submitForm.baselineId" placeholder="请选择基准数据集" filterable style="width:100%;">
+                    <el-option v-for="ds in datasets" :key="ds.id"
+                        :label="`${ds.dataset_name}（${(ds.sample_count||0).toLocaleString()} 条）`"
+                        :value="ds.id" :disabled="ds.status !== 'ready' || ds.id === uploadedId" />
+                </el-select>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;">
+                <el-button @click="step=0">上一步</el-button>
+                <el-button type="primary" :disabled="!submitForm.detectors.length" @click="step=2">
+                    下一步（已选 {{ submitForm.detectors.length }} 个）
+                </el-button>
+            </div>
+        </div>
+
+        <!-- Step 2: 确认提交 -->
+        <div v-show="step === 2" class="step-content">
+            <el-descriptions :column="2" border style="margin-bottom:20px;">
+                <el-descriptions-item label="数据集">{{ getDatasetName(uploadedId) }}</el-descriptions-item>
+                <el-descriptions-item label="检测算法数">{{ submitForm.detectors.length }} 个</el-descriptions-item>
+                <el-descriptions-item label="已选算法" :span="2">
+                    <el-tag v-for="d in submitForm.detectors" :key="d" size="small" style="margin:2px;" effect="dark">
+                        {{ getDetectorDisplayName(d) }}
+                    </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item v-if="submitForm.baselineId" label="基准数据集" :span="2">
+                    {{ getDatasetName(submitForm.baselineId) }}
+                </el-descriptions-item>
+            </el-descriptions>
+            <div style="display:flex;gap:10px;">
+                <el-button @click="step=1">上一步</el-button>
+                <el-button type="primary" size="large" :loading="loading.submit" @click="submitTask">
+                    <el-icon><circle-check /></el-icon> 提交检测任务
+                </el-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     检测任务列表
+═══════════════════════════════════════ -->
+<div v-if="page === 'tasks'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">检测任务列表</span>
+            <div style="display:flex;gap:8px;">
+                <el-button circle size="small" @click="loadTasks"><el-icon><refresh /></el-icon></el-button>
+                <el-button type="primary" size="small" @click="page='submit'"><el-icon><plus /></el-icon> 新建检测</el-button>
+            </div>
+        </div>
+        <el-table :data="tasks" stripe v-loading="loading.tasks" style="width:100%">
+            <el-table-column prop="task_no" label="任务编号" width="150" />
+            <el-table-column label="数据集" min-width="150">
+                <template #default="s">{{ getDatasetName(s.row.dataset) }}</template>
+            </el-table-column>
+            <el-table-column label="状态" width="100">
+                <template #default="s">
+                    <el-tag :type="statusType(s.row.status)" size="small" effect="dark">
+                        <span v-if="s.row.status==='running'" class="spinning" style="margin-right:4px;">⟳</span>
+                        {{ statusLabel(s.row.status) }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="进度" width="120">
+                <template #default="s">
+                    <el-progress :percentage="s.row.progress||0" :show-text="false"
+                        :status="s.row.status==='success'?'success':s.row.status==='failed'?'exception':''" :stroke-width="6" />
+                </template>
+            </el-table-column>
+            <el-table-column label="风险分数" width="100">
+                <template #default="s">
+                    <span v-if="s.row.risk_score!=null" style="font-weight:600;"
+                        :style="{color:riskColor(s.row.risk_score)}">{{ (s.row.risk_score*100).toFixed(1) }}%</span>
+                    <span v-else style="color:var(--text-muted);">-</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" width="160">
+                <template #default="s">{{ formatDate(s.row.created_at) }}</template>
+            </el-table-column>
+            <el-table-column label="操作" width="120" fixed="right">
+                <template #default="s">
+                    <el-button v-if="s.row.status==='success'" size="small" type="primary" @click="viewTask(s.row)">查看报告</el-button>
+                    <el-button v-else-if="s.row.status==='failed'" size="small" type="danger" plain @click="viewTask(s.row)">查看错误</el-button>
+                    <span v-else style="color:var(--text-muted);font-size:12px;">运行中...</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div v-if="!tasks.length && !loading.tasks" class="empty-state">
+            <el-icon><list /></el-icon>
+            <p>暂无检测任务</p>
+            <el-button type="primary" style="margin-top:12px;" @click="page='submit'">提交第一个检测</el-button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     检测报告详情
+═══════════════════════════════════════ -->
+<div v-if="page === 'reports'">
+    <!-- 报告列表 -->
+    <template v-if="!currentTask">
+        <div class="dp-card">
+            <div class="dp-card-header">
+                <span class="dp-card-title">已完成的检测报告</span>
+            </div>
+            <div v-if="!completedTasks.length" class="empty-state">
+                <el-icon><data-analysis /></el-icon>
+                <p>暂无已完成的检测报告</p>
+            </div>
+            <el-table v-else :data="completedTasks" stripe style="width:100%">
+                <el-table-column prop="task_no" label="任务编号" width="150" />
+                <el-table-column label="数据集" min-width="160">
+                    <template #default="s">{{ getDatasetName(s.row.dataset) }}</template>
+                </el-table-column>
+                <el-table-column label="风险等级" width="100">
+                    <template #default="s">
+                        <el-tag :type="s.row.risk_score>=0.15?'danger':s.row.risk_score>=0.05?'warning':'success'" size="small" effect="dark">
+                            {{ riskLabel(s.row.risk_score) }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="风险分数" width="100">
+                    <template #default="s">
+                        <span :style="{color:riskColor(s.row.risk_score),fontWeight:'600'}">
+                            {{ s.row.risk_score!=null?(s.row.risk_score*100).toFixed(1)+'%':'-' }}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="完成时间" width="160">
+                    <template #default="s">{{ formatDate(s.row.created_at) }}</template>
+                </el-table-column>
+                <el-table-column label="操作" width="100" fixed="right">
+                    <template #default="s">
+                        <el-button size="small" type="primary" @click="viewTask(s.row)">查看报告</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+    </template>
+
+    <!-- 报告详情 -->
+    <template v-else>
+        <el-page-header @back="closeTask" style="margin-bottom:20px;">
+            <template #content>
+                <span style="font-weight:600;color:#fff;">检测报告 — {{ currentTask.task_no }}</span>
+            </template>
+        </el-page-header>
+
+        <!-- 概览卡片 -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(59,130,246,0.15);">
+                    <el-icon :size="24" color="var(--accent)"><warning /></el-icon>
+                </div>
+                <div>
+                    <div class="stat-value">{{ (currentTask.total_suspicious??0).toLocaleString() }}</div>
+                    <div class="stat-label">可疑样本数</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" :style="{background:riskBg(currentTask.risk_score)}">
+                    <el-icon :size="24" :color="riskColor(currentTask.risk_score)"><data-analysis /></el-icon>
+                </div>
+                <div>
+                    <div class="stat-value" :style="{color:riskColor(currentTask.risk_score)}">
+                        {{ currentTask.risk_score!=null?(currentTask.risk_score*100).toFixed(1)+'%':'-' }}
+                    </div>
+                    <div class="stat-label">综合风险分数</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" :style="{background:riskBg(currentTask.risk_score)}">
+                    <el-icon :size="24" :color="riskColor(currentTask.risk_score)"><circle-check /></el-icon>
+                </div>
+                <div>
+                    <div class="stat-value" style="font-size:20px;" :style="{color:riskColor(currentTask.risk_score)}">
+                        {{ riskLabel(currentTask.risk_score) }}
+                    </div>
+                    <div class="stat-label">风险等级</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(16,185,129,0.15);">
+                    <el-icon :size="24" color="var(--success)"><document /></el-icon>
+                </div>
+                <div>
+                    <div class="stat-value" style="font-size:18px;">
+                        {{ currentDataset ? currentDataset.sample_count.toLocaleString() : '-' }}
+                    </div>
+                    <div class="stat-label">数据集样本总数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检测结论 -->
+        <div class="conclusion-box" :class="riskConclClass(currentTask.risk_score)">
+            <div style="display:flex;gap:12px;">
+                <el-icon :size="22" :color="riskColor(currentTask.risk_score)">
+                    <component :is="currentTask.risk_score>=0.15?'WarningFilled':currentTask.risk_score>=0.05?'Warning':'CircleCheckFilled'" />
+                </el-icon>
+                <div>
+                    <div style="font-size:15px;font-weight:700;margin-bottom:6px;" :style="{color:riskColor(currentTask.risk_score)}">
+                        {{ riskLabel(currentTask.risk_score) }} — 检测结论
+                    </div>
+                    <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">{{ conclusionText }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误信息 -->
+        <el-alert v-if="currentTask.error_message" :title="currentTask.error_message" type="error" show-icon style="margin-bottom:16px;" />
+
+        <!-- 综合风险评分条 -->
+        <div class="dp-card" v-if="currentTask.risk_score!=null">
+            <div class="dp-card-header">
+                <span class="dp-card-title">综合风险评分</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <span style="width:30px;font-size:12px;color:var(--text-muted);">0%</span>
+                <div style="flex:1;position:relative;">
+                    <div style="height:12px;background:var(--bg-input);border-radius:6px;overflow:hidden;">
+                        <div style="height:100%;border-radius:6px;transition:width .6s;"
+                            :style="{width:Math.min(currentTask.risk_score*100,100)+'%',background:riskGradient(currentTask.risk_score)}"></div>
+                    </div>
+                    <div style="position:absolute;top:-3px;left:5%;width:1px;height:18px;background:var(--success);opacity:.5;"></div>
+                    <div style="position:absolute;top:-3px;left:15%;width:1px;height:18px;background:var(--danger);opacity:.5;"></div>
+                    <div style="position:absolute;top:16px;left:3%;font-size:10px;color:var(--success);">5%</div>
+                    <div style="position:absolute;top:16px;left:13%;font-size:10px;color:var(--danger);">15%</div>
+                </div>
+                <span style="width:60px;font-size:16px;font-weight:700;text-align:right;"
+                    :style="{color:riskColor(currentTask.risk_score)}">{{ (currentTask.risk_score*100).toFixed(1) }}%</span>
+            </div>
+        </div>
+
+        <!-- 分布分析 -->
+        <template v-if="reportStats">
+            <div class="analysis-grid">
+                <div class="chart-card">
+                    <div class="chart-title">风险类型分布</div>
+                    <div v-for="item in reportStats.byRiskType" :key="item.type" class="hbar-row">
+                        <div class="hbar-label">
+                            <span class="hbar-name">{{ riskTypeLabel(item.type) }}</span>
+                            <span class="hbar-val">{{ item.count }} 条 · {{ item.pct }}%</span>
+                        </div>
+                        <div class="hbar-track">
+                            <div class="hbar-fill" :style="{width:(item.count/reportStats.maxRtCount*100)+'%',background:riskTypeColor(item.type)}"></div>
+                        </div>
+                    </div>
+                    <div v-if="!reportStats.byRiskType.length" style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">无风险类型数据</div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">各检测器发现样本数</div>
+                    <div v-for="item in reportStats.byDetector" :key="item.name" class="hbar-row">
+                        <div class="hbar-label">
+                            <span class="hbar-name">{{ item.name }}</span>
+                            <span class="hbar-val">{{ item.count }} 条 · 均值 {{ item.avgConf }}%</span>
+                        </div>
+                        <div class="hbar-track">
+                            <div class="hbar-fill" :style="{width:(item.count/reportStats.maxDetCount*100)+'%',background:'var(--accent)'}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 处理建议分布 -->
+            <div style="display:flex;gap:12px;margin-bottom:20px;">
+                <div v-for="item in reportStats.sugList" :key="item.sug" style="flex:1;border-radius:10px;padding:16px;text-align:center;border:1px solid;"
+                    :style="{background:sugStyle(item.sug).bg,borderColor:sugStyle(item.sug).border}">
+                    <div style="font-size:28px;font-weight:700;line-height:1;" :style="{color:sugStyle(item.sug).text}">{{ item.count }}</div>
+                    <div style="font-size:12px;margin-top:4px;opacity:.8;" :style="{color:sugStyle(item.sug).text}">{{ item.pct }}%</div>
+                    <div style="font-size:13px;font-weight:600;margin-top:6px;" :style="{color:sugStyle(item.sug).text}">{{ suggestionLabel(item.sug) }}</div>
+                </div>
+            </div>
+
+            <!-- 置信度分布直方图 -->
+            <div class="dp-card">
+                <div class="dp-card-header">
+                    <span class="dp-card-title">置信度分布直方图</span>
+                </div>
+                <div class="hist-wrap">
+                    <div v-for="(count,i) in reportStats.confBuckets" :key="i" class="hist-col">
+                        <span class="hist-count">{{ count }}</span>
+                        <div class="hist-bar" :style="{height:(count/reportStats.maxBucket*90)+'px',background:confBucketColor(i)}"></div>
+                        <span class="hist-range">{{ ['0-20','20-40','40-60','60-80','80-100'][i] }}%</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center;">
+                    置信度越高（越靠右）表示该样本被判定为可疑的确信程度越高
+                </div>
+            </div>
+        </template>
+
+        <!-- 失败检测器 -->
+        <div class="dp-card" v-if="currentTask?.failed_detectors?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">失败检测器</span>
+                <el-tag type="warning" size="small" effect="dark">{{ currentTask.failed_detectors.length }} 个检测器执行失败</el-tag>
+            </div>
+            <div v-for="fd in currentTask.failed_detectors" :key="fd.detector_name"
+                style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid var(--danger);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-weight:600;color:#fff;">{{ fd.display_name || fd.detector_name }}</span>
+                    <el-tag type="danger" size="small" effect="dark">执行失败</el-tag>
+                </div>
+                <div style="color:var(--text-secondary);font-size:13px;">
+                    <strong>原因：</strong>{{ fd.error_message || '检测器执行失败或无结果返回' }}
+                </div>
+                <div style="color:var(--text-muted);font-size:12px;margin-top:4px;">
+                    建议：选择包含该检测器所需特征类型的数据集，或使用其他检测器
+                </div>
+            </div>
+        </div>
+
+        <!-- ECharts 图表区域 -->
+        <div class="analysis-grid" v-if="analysisData?.chart_data">
+            <div class="chart-card">
+                <div class="chart-title">各检测器风险分数对比</div>
+                <div id="chart-detector-risk" style="width:100%;height:320px;"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">各检测器可疑样本数</div>
+                <div id="chart-detector-count" style="width:100%;height:320px;"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">风险类型分布</div>
+                <div id="chart-risk-type" style="width:100%;height:320px;"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">置信度分布</div>
+                <div id="chart-confidence" style="width:100%;height:320px;"></div>
+            </div>
+        </div>
+
+        <!-- 风险评分分解 -->
+        <div class="dp-card" v-if="analysisData?.risk_decomposition?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">风险评分分解</span>
+            </div>
+            <p style="color:var(--text-muted);font-size:12px;margin-bottom:12px;">
+                综合风险分数 = Σ(权重 × 可疑比例)，反映各风险类型对整体评分的贡献
+            </p>
+            <el-table :data="analysisData.risk_decomposition" size="small" stripe style="width:100%">
+                <el-table-column prop="detector_type_label" label="风险类型" width="120" />
+                <el-table-column label="权重" width="80" align="center">
+                    <template #default="s">{{ s.row.weight.toFixed(2) }}</template>
+                </el-table-column>
+                <el-table-column label="可疑比例" width="100" align="center">
+                    <template #default="s">{{ (s.row.ratio*100).toFixed(2) }}%</template>
+                </el-table-column>
+                <el-table-column label="贡献值" width="100" align="center">
+                    <template #default="s">
+                        <strong :style="{color:riskColor(s.row.contribution)}">{{ (s.row.contribution*100).toFixed(2) }}%</strong>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="suspicious_count" label="可疑样本数" width="100" align="center" />
+            </el-table>
+        </div>
+
+        <!-- 检测方法说明 -->
+        <div class="dp-card" v-if="analysisData?.per_detector_analysis?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">检测方法说明</span>
+            </div>
+            <div v-for="d in analysisData.per_detector_analysis" :key="d.detector_name"
+                style="background:var(--bg-input);border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid var(--accent);">
+                <div style="font-weight:600;color:var(--accent);margin-bottom:6px;">
+                    {{ d.display_name }}
+                    <el-tag :type="detectorTypeTag(d.detector_type)" size="small" effect="dark" style="margin-left:6px;">{{ d.detector_type_label }}</el-tag>
+                </div>
+                <div style="color:var(--text-secondary);font-size:13px;line-height:1.7;">{{ d.method_explanation }}</div>
+            </div>
+        </div>
+
+        <!-- 各检测器详细分析 -->
+        <div class="dp-card" v-if="analysisData?.per_detector_analysis?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">各检测器分析结果</span>
+            </div>
+            <div v-for="d in analysisData.per_detector_analysis" :key="d.detector_name"
+                style="background:var(--bg-input);border-radius:8px;padding:16px;margin-bottom:12px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-weight:600;font-size:14px;color:#fff;">{{ d.display_name }}</span>
+                    <div style="display:flex;gap:8px;">
+                        <el-tag type="danger" size="small" effect="dark">{{ d.suspicious_count }} 条可疑</el-tag>
+                        <el-tag size="small" effect="dark">占比 {{ (d.ratio*100).toFixed(1) }}%</el-tag>
+                    </div>
+                </div>
+                <div style="color:var(--text-secondary);font-size:13px;line-height:1.7;margin-bottom:8px;">
+                    <strong style="color:var(--text-primary);">分析发现：</strong>{{ d.findings }}
+                </div>
+                <div style="display:flex;gap:16px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;">
+                    <span>平均置信度：<strong style="color:var(--text-primary);">{{ (d.avg_confidence*100).toFixed(1) }}%</strong></span>
+                    <span>最高置信度：<strong style="color:var(--text-primary);">{{ (d.max_confidence*100).toFixed(1) }}%</strong></span>
+                    <span v-for="(count,rt) in d.risk_type_distribution" :key="rt">{{ rt }}：{{ count }} 条</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 置信度统计 -->
+        <div class="dp-card" v-if="analysisData?.confidence_stats">
+            <div class="dp-card-header">
+                <span class="dp-card-title">置信度统计</span>
+            </div>
+            <el-descriptions :column="3" border size="small">
+                <el-descriptions-item label="平均置信度"><strong>{{ (analysisData.confidence_stats.mean*100).toFixed(1) }}%</strong></el-descriptions-item>
+                <el-descriptions-item label="标准差">{{ (analysisData.confidence_stats.std*100).toFixed(1) }}%</el-descriptions-item>
+                <el-descriptions-item label="样本数">{{ analysisData.confidence_stats.count }}</el-descriptions-item>
+                <el-descriptions-item label="最低置信度">{{ (analysisData.confidence_stats.min*100).toFixed(1) }}%</el-descriptions-item>
+                <el-descriptions-item label="最高置信度">{{ (analysisData.confidence_stats.max*100).toFixed(1) }}%</el-descriptions-item>
+            </el-descriptions>
+            <div style="display:flex;gap:16px;margin-top:12px;">
+                <div style="flex:1;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;text-align:center;">
+                    <div style="font-size:22px;font-weight:700;color:var(--danger);">{{ analysisData.confidence_stats.high_conf_count }}</div>
+                    <div style="font-size:12px;color:var(--text-muted);">高置信度（≥80%）</div>
+                </div>
+                <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px;text-align:center;">
+                    <div style="font-size:22px;font-weight:700;color:var(--warning);">{{ analysisData.confidence_stats.medium_conf_count }}</div>
+                    <div style="font-size:12px;color:var(--text-muted);">中置信度（50%-80%）</div>
+                </div>
+                <div style="flex:1;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:12px;text-align:center;">
+                    <div style="font-size:22px;font-weight:700;color:var(--success);">{{ analysisData.confidence_stats.low_conf_count }}</div>
+                    <div style="font-size:12px;color:var(--text-muted);">低置信度（＜50%）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 交叉检测 -->
+        <div class="dp-card" v-if="analysisData?.cross_detector_overlap?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">交叉检测结果</span>
+                <el-tag type="warning" size="small" effect="dark">{{ analysisData.cross_detector_overlap.length }} 个样本被多个检测器标记</el-tag>
+            </div>
+            <p style="color:var(--text-muted);font-size:12px;margin-bottom:12px;">
+                被多个检测器同时标记的样本具有更高的可信度，应优先处理
+            </p>
+            <el-table :data="analysisData.cross_detector_overlap" size="small" stripe style="width:100%" max-height="250">
+                <el-table-column prop="sample_id" label="样本 ID" width="130" />
+                <el-table-column label="标记检测器" min-width="200">
+                    <template #default="s">
+                        <el-tag v-for="d in s.row.detectors" :key="d" size="small" style="margin:2px;" effect="dark">{{ getDetectorDisplayName(d) }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="count" label="检测器数" width="100" align="center">
+                    <template #default="s">
+                        <el-tag :type="s.row.count>=3?'danger':'warning'" size="small" effect="dark">{{ s.row.count }} 个</el-tag>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <!-- 综合结论 -->
+        <div class="dp-card" v-if="analysisData?.conclusion">
+            <div class="dp-card-header">
+                <span class="dp-card-title">综合结论与建议</span>
+            </div>
+            <div class="conclusion-box" :class="riskConclClass(analysisData.conclusion.risk_score)">
+                <div style="display:flex;gap:12px;">
+                    <el-icon :size="22" :color="riskColor(analysisData.conclusion.risk_score)">
+                        <component :is="analysisData.conclusion.risk_level==='high'?'WarningFilled':analysisData.conclusion.risk_level==='medium'?'Warning':'CircleCheckFilled'" />
+                    </el-icon>
+                    <div>
+                        <div style="font-size:15px;font-weight:700;margin-bottom:6px;" :style="{color:riskColor(analysisData.conclusion.risk_score)}">
+                            {{ analysisData.conclusion.risk_level_text }} — 检测结论
+                        </div>
+                        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">{{ analysisData.conclusion.summary }}</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:12px;">
+                <div style="font-weight:600;margin-bottom:8px;color:var(--text-primary);">行动建议：</div>
+                <ol style="margin:0;padding-left:20px;color:var(--text-secondary);line-height:2;">
+                    <li v-for="(rec,i) in analysisData.conclusion.recommendations" :key="i">{{ rec }}</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 可疑样本明细 -->
+        <div class="dp-card">
+            <div class="dp-card-header">
+                <span class="dp-card-title">可疑样本明细</span>
+                <el-tag v-if="currentTask.total_suspicious" type="danger" size="small" effect="dark">共 {{ currentTask.total_suspicious }} 条</el-tag>
+            </div>
+            <div v-if="!currentTask.results?.length" class="empty-state" style="padding:30px 0;">
+                <el-icon><circle-check /></el-icon>
+                <p>未检测到可疑样本</p>
+            </div>
+            <el-table v-else :data="currentTask.results" stripe size="small" style="width:100%" max-height="400">
+                <el-table-column prop="sample_id" label="样本 ID" width="110" />
+                <el-table-column label="风险类型" width="100">
+                    <template #default="s">
+                        <el-tag size="small" :type="s.row.risk_type==='label_poison'?'danger':s.row.risk_type==='backdoor'?'info':'warning'" effect="dark">
+                            {{ riskTypeLabel(s.row.risk_type) }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="置信度" width="120">
+                    <template #default="s">
+                        <div style="display:flex;align-items:center;gap:4px;">
+                            <el-progress style="flex:1;" :percentage="Math.round(s.row.confidence*100)" :stroke-width="5" :show-text="false"
+                                :color="s.row.confidence>=0.8?'var(--danger)':s.row.confidence>=0.6?'var(--warning)':'var(--accent)'" />
+                            <span style="font-size:11px;width:38px;flex-shrink:0;">{{ (s.row.confidence*100).toFixed(1) }}%</span>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="处理建议" width="100">
+                    <template #default="s">
+                        <el-tag size="small" :type="s.row.suggestion==='remove'?'danger':s.row.suggestion==='relabel'?'warning':'info'" effect="dark">
+                            {{ suggestionLabel(s.row.suggestion) }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="detector_name" label="检测器" min-width="130" show-overflow-tooltip />
+            </el-table>
+        </div>
+
+        <!-- 任务信息 -->
+        <div class="dp-card">
+            <div class="dp-card-header">
+                <span class="dp-card-title">任务信息</span>
+            </div>
+            <el-descriptions :column="2" border size="small">
+                <el-descriptions-item label="任务编号">{{ currentTask.task_no }}</el-descriptions-item>
+                <el-descriptions-item label="状态"><el-tag :type="statusType(currentTask.status)" size="small" effect="dark">{{ statusLabel(currentTask.status) }}</el-tag></el-descriptions-item>
+                <el-descriptions-item label="数据集">{{ currentTask.dataset?.name ?? getDatasetName(currentTask.dataset?.id) }}</el-descriptions-item>
+                <el-descriptions-item label="样本总数">{{ currentDataset?currentDataset.sample_count.toLocaleString():'-' }}</el-descriptions-item>
+                <el-descriptions-item label="开始时间">{{ formatDate(currentTask.started_at) }}</el-descriptions-item>
+                <el-descriptions-item label="完成时间">{{ formatDate(currentTask.finished_at) }}</el-descriptions-item>
+                <el-descriptions-item label="使用算法" :span="2">
+                    <el-tag v-for="d in (currentTask.detector_config?.detectors||[])" :key="d" size="small" style="margin:2px;" effect="dark">{{ getDetectorDisplayName(d) }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item v-if="currentTask.error_message" label="错误信息" :span="2">
+                    <span style="color:var(--danger);">{{ currentTask.error_message }}</span>
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="dp-card" v-if="currentTask.status==='success'">
+            <div class="dp-card-header">
+                <span class="dp-card-title">后续操作</span>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <el-button type="warning" @click="goToDefense"><el-icon><brush /></el-icon> 数据无害化处理</el-button>
+                <el-button type="primary" :loading="loading.report" @click="generateReport"><el-icon><document /></el-icon> 生成 HTML 报告</el-button>
+                <el-button type="info" :loading="loading.llmReport" @click="generateLLMReport"><el-icon><chat-dot-round /></el-icon> 生成 LLM 分析报告</el-button>
+                <el-button v-if="reportInfo" type="success" @click="downloadReport"><el-icon><download /></el-icon> 下载报告</el-button>
+            </div>
+            <el-alert v-if="reportInfo" title="报告已生成" type="success" :closable="false" show-icon style="margin-top:12px;">
+                <template #default>
+                    报告 ID: {{ reportInfo.report_id }}，类型: {{ reportInfo.report_type }}
+                    <el-button link type="primary" @click="downloadReport" style="margin-left:8px;">立即下载</el-button>
+                </template>
+            </el-alert>
+            <!-- LLM 报告内容 -->
+            <div v-if="llmReportContent" style="margin-top:16px;">
+                <div style="font-size:14px;font-weight:600;color:var(--accent);margin-bottom:12px;">
+                    <el-icon><chat-dot-round /></el-icon> LLM 深度分析报告
+                </div>
+                <div class="llm-content" v-html="formatLLMContent(llmReportContent)"></div>
+            </div>
+        </div>
+    </template>
+</div>
+
+<!-- ═══════════════════════════════════════
+     数据集管理
+═══════════════════════════════════════ -->
+<div v-if="page === 'datasets'">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:14px;color:var(--text-secondary);">共 <strong style="color:#fff;">{{ datasets.length }}</strong> 个数据集</div>
+        <div style="display:flex;gap:8px;">
+            <el-button size="small" @click="loadDatasets" :loading="loading.datasets"><el-icon><refresh /></el-icon></el-button>
+            <el-button type="primary" size="small" @click="openUploadDialog"><el-icon><upload /></el-icon> 导入数据集</el-button>
+        </div>
+    </div>
+
+    <div v-if="loading.datasets" style="text-align:center;padding:60px 0;">
+        <el-icon class="spinning" :size="32" style="color:var(--accent);"><loading /></el-icon>
+        <div style="margin-top:12px;color:var(--text-muted);">加载中...</div>
+    </div>
+
+    <div v-else-if="!datasets.length" class="empty-state">
+        <el-icon><folder-opened /></el-icon>
+        <p>暂无数据集，<el-link type="primary" @click="openUploadDialog">立即导入</el-link></p>
+    </div>
+
+    <div v-else class="ds-grid">
+        <div v-for="ds in datasets" :key="ds.id" class="ds-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+                <div style="font-size:15px;font-weight:600;color:#fff;word-break:break-all;flex:1;margin-right:8px;">{{ ds.dataset_name }}</div>
+                <el-tag :type="ds.status==='ready'?'success':'warning'" size="small" effect="dark">{{ ds.status==='ready'?'就绪':ds.status }}</el-tag>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:12px;">
+                <div style="color:var(--text-muted);">样本数 <strong style="color:var(--text-primary);">{{ ds.sample_count!=null?ds.sample_count.toLocaleString():'-' }}</strong></div>
+                <div style="color:var(--text-muted);">大小 <strong style="color:var(--text-primary);">{{ formatSize(ds.file_size) }}</strong></div>
+                <div style="color:var(--text-muted);">标签列 <strong style="color:var(--text-primary);">{{ ds.label_field||'-' }}</strong></div>
+                <div style="color:var(--text-muted);">文本列 <strong style="color:var(--text-primary);">{{ ds.text_field||'-' }}</strong></div>
+                <div style="color:var(--text-muted);grid-column:1/-1;">上传时间 <strong style="color:var(--text-primary);">{{ formatDate(ds.created_at) }}</strong></div>
+            </div>
+            <div style="margin-bottom:12px;min-height:22px;">
+                <template v-if="ds.column_meta">
+                    <el-tag v-for="(info,col) in ds.column_meta" :key="col" size="small"
+                        :type="info.is_target?'danger':info.is_text?'primary':'info'" style="margin:2px;" effect="dark">
+                        {{ col }}<span v-if="info.is_target"> (标签)</span><span v-else-if="info.is_text"> (文本)</span>
+                    </el-tag>
+                </template>
+                <span v-else style="font-size:12px;color:var(--text-muted);">暂无列信息</span>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:12px;margin-top:auto;">
+                <el-button size="small" @click="openDatasetDetail(ds)"><el-icon><zoom-in /></el-icon> 预览</el-button>
+                <el-button size="small" type="primary" :disabled="ds.status!=='ready'" @click="startDetectFromDs(ds)"><el-icon><cpu /></el-icon> 检测</el-button>
+                <el-button size="small" type="danger" plain @click="deleteDataset(ds)"><el-icon><delete /></el-icon></el-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据集详情 Dialog -->
+    <el-dialog v-model="showDatasetDetail" width="860px" destroy-on-close
+        :title="datasetDetail?'数据集详情 — '+datasetDetail.dataset_name:'数据集详情'">
+        <template v-if="datasetDetail">
+            <el-descriptions :column="3" border size="small" style="margin-bottom:20px;">
+                <el-descriptions-item label="名称" :span="2"><strong>{{ datasetDetail.dataset_name }}</strong></el-descriptions-item>
+                <el-descriptions-item label="状态"><el-tag :type="datasetDetail.status==='ready'?'success':'warning'" size="small" effect="dark">{{ datasetDetail.status==='ready'?'就绪':datasetDetail.status }}</el-tag></el-descriptions-item>
+                <el-descriptions-item label="样本数"><strong>{{ datasetDetail.sample_count!=null?datasetDetail.sample_count.toLocaleString():'-' }}</strong></el-descriptions-item>
+                <el-descriptions-item label="文件大小">{{ formatSize(datasetDetail.file_size) }}</el-descriptions-item>
+                <el-descriptions-item label="数据类型">{{ datasetDetail.dataset_type }}</el-descriptions-item>
+                <el-descriptions-item label="标签列"><el-tag v-if="datasetDetail.label_field" type="danger" size="small" effect="dark">{{ datasetDetail.label_field }}</el-tag><span v-else style="color:var(--text-muted);">未识别</span></el-descriptions-item>
+                <el-descriptions-item label="文本列"><el-tag v-if="datasetDetail.text_field" type="primary" size="small" effect="dark">{{ datasetDetail.text_field }}</el-tag><span v-else style="color:var(--text-muted);">未识别</span></el-descriptions-item>
+                <el-descriptions-item label="上传时间">{{ formatDate(datasetDetail.created_at) }}</el-descriptions-item>
+            </el-descriptions>
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">列信息（{{ datasetColumns.length }} 列）</div>
+                <el-table :data="datasetColumns" size="small" stripe style="width:100%;">
+                    <el-table-column prop="name" label="列名" min-width="130" show-overflow-tooltip />
+                    <el-table-column label="数据类型" width="110">
+                        <template #default="s"><el-tag size="small" :type="dtypeTag(s.row.dtype)" effect="dark">{{ s.row.dtype||'-' }}</el-tag></template>
+                    </el-table-column>
+                    <el-table-column label="角色" width="90" align="center">
+                        <template #default="s">
+                            <el-tag v-if="s.row.is_target" type="danger" size="small" effect="dark">标签列</el-tag>
+                            <el-tag v-else-if="s.row.is_text" type="primary" size="small" effect="dark">文本列</el-tag>
+                            <span v-else style="color:var(--text-muted);font-size:12px;">—</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="唯一值" width="80" align="center">
+                        <template #default="s">{{ s.row.unique_count!=null?s.row.unique_count.toLocaleString():'-' }}</template>
+                    </el-table-column>
+                    <el-table-column label="空值数" width="80" align="center">
+                        <template #default="s">
+                            <span :style="{color:s.row.null_count>0?'var(--danger)':'var(--success)',fontWeight:'600'}">{{ s.row.null_count!=null?s.row.null_count:'-' }}</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:13px;font-weight:600;color:var(--text-primary);">数据预览（前 {{ datasetPreviewRows.length }} 行 / 共 {{ datasetPreviewTotal.toLocaleString() }} 行）</span>
+                </div>
+                <div v-if="loading.preview" style="text-align:center;padding:30px 0;">
+                    <el-icon class="spinning" :size="24" style="color:var(--accent);"><loading /></el-icon>
+                    <div style="margin-top:8px;color:var(--text-muted);font-size:13px;">加载预览数据...</div>
+                </div>
+                <el-table v-else-if="datasetPreviewRows.length" :data="datasetPreviewRows" size="small" stripe max-height="260" style="width:100%;">
+                    <el-table-column v-for="col in datasetPreviewCols" :key="col" :label="col" min-width="120" show-overflow-tooltip>
+                        <template #default="scope">{{ scope.row[col] }}</template>
+                    </el-table-column>
+                </el-table>
+                <div v-else style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">暂无预览数据</div>
+            </div>
+        </template>
+        <template #footer>
+            <el-button @click="showDatasetDetail=false">关闭</el-button>
+            <el-button type="primary" @click="()=>{showDatasetDetail=false;startDetectFromDs(datasetDetail);}"><el-icon><cpu /></el-icon> 立即检测</el-button>
+        </template>
+    </el-dialog>
+
+    <!-- 导入数据集 Dialog -->
+    <el-dialog v-model="showUploadDialog" title="导入数据集" width="520px" destroy-on-close>
+        <el-form label-width="100px">
+            <el-form-item label="选择文件" required>
+                <el-upload :auto-upload="false" :limit="1" accept=".csv,.tsv" :on-change="handleDsUploadChange" drag style="width:100%;">
+                    <el-icon :size="36" style="color:var(--text-muted);"><upload-filled /></el-icon>
+                    <div style="margin-top:6px;color:var(--text-secondary);">拖拽文件到此处，或<em style="color:var(--accent);">点击选择</em></div>
+                    <template #tip><div style="font-size:12px;color:var(--text-muted);">支持 .csv / .tsv 格式</div></template>
+                </el-upload>
+            </el-form-item>
+            <el-form-item label="数据集名称"><el-input v-model="dsUploadForm.datasetName" placeholder="留空则使用文件名" clearable /></el-form-item>
+            <el-form-item label="数据类型">
+                <el-select v-model="dsUploadForm.datasetType" style="width:100%;">
+                    <el-option label="CSV 表格数据" value="csv" />
+                    <el-option label="文本数据" value="text" />
+                    <el-option label="图像数据" value="image" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="showUploadDialog=false">取消</el-button>
+            <el-button type="primary" :loading="loading.upload" @click="doDsUpload"><el-icon><upload /></el-icon> 上传导入</el-button>
+        </template>
+    </el-dialog>
+</div>
+
+<!-- ═══════════════════════════════════════
+     数据预处理
+═══════════════════════════════════════ -->
+<div v-if="page === 'preprocess'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">数据预处理</span>
+        </div>
+        <div v-if="!datasets.length" class="empty-state">
+            <el-icon><magic-stick /></el-icon>
+            <p>请先导入数据集</p>
+            <el-button type="primary" style="margin-top:12px;" @click="page='datasets'">前往导入</el-button>
+        </div>
+        <template v-else>
+            <el-form label-width="120px" style="max-width:600px;">
+                <el-form-item label="选择数据集">
+                    <el-select v-model="preprocessForm.datasetId" placeholder="请选择数据集" filterable style="width:100%;">
+                        <el-option v-for="ds in datasets" :key="ds.id"
+                            :label="`${ds.dataset_name}（${(ds.sample_count||0).toLocaleString()} 条）`"
+                            :value="ds.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="去重">
+                    <el-switch v-model="preprocessForm.dedup" />
+                </el-form-item>
+                <el-form-item label="缺失值处理">
+                    <el-radio-group v-model="preprocessForm.missingStrategy">
+                        <el-radio-button label="drop">删除含空值行</el-radio-button>
+                        <el-radio-button label="fill_mean">均值插补</el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="标准化">
+                    <el-switch v-model="preprocessForm.normalize" />
+                    <span style="font-size:12px;color:var(--text-muted);margin-left:8px;">对数值列进行 Z-score 标准化</span>
+                </el-form-item>
+                <el-form-item label="类别编码">
+                    <el-switch v-model="preprocessForm.encodeCategorical" />
+                    <span style="font-size:12px;color:var(--text-muted);margin-left:8px;">对类别列进行 Label Encoding</span>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" :loading="loading.preprocess" :disabled="!preprocessForm.datasetId" @click="runPreprocess">
+                        <el-icon><magic-stick /></el-icon> 执行预处理
+                    </el-button>
+                </el-form-item>
+            </el-form>
+
+            <!-- 预处理结果 -->
+            <div v-if="preprocessResult" style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+                <div class="dp-card-title" style="margin-bottom:16px;">预处理结果</div>
+                <el-descriptions :column="2" border size="small">
+                    <el-descriptions-item label="原始样本数">{{ preprocessResult.original_count?.toLocaleString() || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="处理后样本数">{{ preprocessResult.processed_count?.toLocaleString() || '-' }}</el-descriptions-item>
+                    <el-descriptions-item label="删除样本数">{{ preprocessResult.removed_count || 0 }}</el-descriptions-item>
+                    <el-descriptions-item label="状态"><el-tag type="success" size="small" effect="dark">完成</el-tag></el-descriptions-item>
+                    <el-descriptions-item v-if="preprocessResult.numeric_cols_normalized?.length" label="标准化列" :span="2">
+                        <el-tag v-for="c in preprocessResult.numeric_cols_normalized" :key="c" size="small" style="margin:2px;" effect="dark">{{ c }}</el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item v-if="preprocessResult.categorical_cols_encoded?.length" label="编码列" :span="2">
+                        <el-tag v-for="c in preprocessResult.categorical_cols_encoded" :key="c" size="small" style="margin:2px;" effect="dark">{{ c }}</el-tag>
+                    </el-descriptions-item>
+                </el-descriptions>
+            </div>
+        </template>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     数据无害化
+═══════════════════════════════════════ -->
+<div v-if="page === 'defense'">
+    <template v-if="!currentTask">
+        <div class="dp-card">
+            <div class="dp-card-header"><span class="dp-card-title">数据无害化处理</span></div>
+            <div class="empty-state">
+                <el-icon><brush /></el-icon>
+                <p>请先在检测报告中选择一个已完成的任务，再进行无害化处理</p>
+                <el-button type="primary" style="margin-top:12px;" @click="page='tasks'">查看检测任务</el-button>
+            </div>
+        </div>
+    </template>
+    <template v-else>
+        <el-page-header @back="page='reports'" style="margin-bottom:20px;">
+            <template #content><span style="font-weight:600;color:#fff;">数据无害化 — {{ currentTask.task_no }}</span></template>
+        </el-page-header>
+
+        <div class="dp-card">
+            <div class="dp-card-header"><span class="dp-card-title">检测结果概览</span></div>
+            <el-descriptions :column="3" border size="small">
+                <el-descriptions-item label="数据集">{{ currentTask.dataset?.name ?? getDatasetName(currentTask.dataset?.id) }}</el-descriptions-item>
+                <el-descriptions-item label="可疑样本数"><el-tag type="danger" size="small" effect="dark">{{ currentTask.total_suspicious||0 }} 条</el-tag></el-descriptions-item>
+                <el-descriptions-item label="风险分数"><span :style="{color:riskColor(currentTask.risk_score),fontWeight:'600'}">{{ currentTask.risk_score!=null?(currentTask.risk_score*100).toFixed(1)+'%':'-' }}</span></el-descriptions-item>
+            </el-descriptions>
+        </div>
+
+        <!-- 逐样本复查 -->
+        <div class="dp-card" v-if="currentTask.results?.length">
+            <div class="dp-card-header">
+                <span class="dp-card-title">逐样本复查</span>
+                <div style="display:flex;gap:8px;">
+                    <el-button size="small" type="primary" :disabled="!selectedSamples.length" @click="batchSampleAction('confirm_poison')">
+                        批量确认投毒 ({{ selectedSamples.length }})
+                    </el-button>
+                    <el-button size="small" type="success" :disabled="!selectedSamples.length" @click="batchSampleAction('mark_clean')">
+                        批量标记正常 ({{ selectedSamples.length }})
+                    </el-button>
+                    <el-button size="small" type="danger" :disabled="!selectedSamples.length" @click="batchSampleAction('remove')">
+                        批量删除 ({{ selectedSamples.length }})
+                    </el-button>
+                </div>
+            </div>
+            <el-table :data="currentTask.results" stripe size="small" style="width:100%" max-height="400"
+                @selection-change="handleSampleSelection">
+                <el-table-column type="selection" width="40" />
+                <el-table-column prop="sample_id" label="样本 ID" width="110" />
+                <el-table-column label="风险类型" width="100">
+                    <template #default="s">
+                        <el-tag size="small" :type="s.row.risk_type==='label_poison'?'danger':s.row.risk_type==='backdoor'?'info':'warning'" effect="dark">
+                            {{ riskTypeLabel(s.row.risk_type) }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="置信度" width="120">
+                    <template #default="s">
+                        <div style="display:flex;align-items:center;gap:4px;">
+                            <el-progress style="flex:1;" :percentage="Math.round(s.row.confidence*100)" :stroke-width="5" :show-text="false"
+                                :color="s.row.confidence>=0.8?'var(--danger)':s.row.confidence>=0.6?'var(--warning)':'var(--accent)'" />
+                            <span style="font-size:11px;width:38px;flex-shrink:0;">{{ (s.row.confidence*100).toFixed(1) }}%</span>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="判定原因" min-width="200" show-overflow-tooltip>
+                    <template #default="s">{{ s.row.reason || '-' }}</template>
+                </el-table-column>
+                <el-table-column label="触发特征" min-width="180" show-overflow-tooltip>
+                    <template #default="s">
+                        <el-tag v-for="f in (s.row.triggered_features||[]).slice(0,3)" :key="f" size="small" style="margin:1px;" effect="dark">{{ f }}</el-tag>
+                        <span v-if="(s.row.triggered_features||[]).length > 3" style="font-size:11px;color:var(--text-muted);">+{{ s.row.triggered_features.length - 3 }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="200" fixed="right">
+                    <template #default="s">
+                        <el-button size="small" @click="viewSampleDetail(s.row)">详情</el-button>
+                        <el-dropdown trigger="click" @command="(cmd) => sampleAction(s.row, cmd)">
+                            <el-button size="small" type="primary" plain>操作 <el-icon><arrow-down /></el-icon></el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item command="confirm_poison">确认投毒</el-dropdown-item>
+                                    <el-dropdown-item command="mark_clean">标记正常</el-dropdown-item>
+                                    <el-dropdown-item command="remove">删除</el-dropdown-item>
+                                    <el-dropdown-item command="relabel">重新标注</el-dropdown-item>
+                                    <el-dropdown-item command="ignore">忽略</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <div class="dp-card">
+            <div class="dp-card-header"><span class="dp-card-title">处理策略配置</span></div>
+            <el-form label-width="120px">
+                <el-form-item label="默认策略">
+                    <el-radio-group v-model="defenseStrategy.default">
+                        <el-radio-button label="remove">删除可疑样本</el-radio-button>
+                        <el-radio-button label="review">标记待审</el-radio-button>
+                        <el-radio-button label="ignore">全部忽略</el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
+            </el-form>
+            <el-divider content-position="left">按建议分类统计</el-divider>
+            <div v-if="reportStats" style="display:flex;gap:12px;">
+                <div v-for="item in reportStats.sugList" :key="item.sug" style="flex:1;border-radius:8px;padding:14px;text-align:center;border:1px solid;"
+                    :style="{background:sugStyle(item.sug).bg,borderColor:sugStyle(item.sug).border}">
+                    <div style="font-size:24px;font-weight:700;line-height:1;" :style="{color:sugStyle(item.sug).text}">{{ item.count }}</div>
+                    <div style="font-size:13px;font-weight:600;margin-top:6px;" :style="{color:sugStyle(item.sug).text}">{{ suggestionLabel(item.sug) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dp-card">
+            <div style="display:flex;gap:12px;align-items:center;">
+                <el-button type="danger" size="large" :loading="loading.defense" @click="applyDefense">
+                    <el-icon><delete /></el-icon> 执行无害化处理
+                </el-button>
+                <span style="color:var(--text-muted);font-size:13px;">将按照上述策略对 {{ currentTask.total_suspicious||0 }} 个可疑样本进行处理</span>
+            </div>
+        </div>
+
+        <div class="dp-card" v-if="defenseResults">
+            <div class="dp-card-header"><span class="dp-card-title">处理结果</span></div>
+            <el-descriptions :column="2" border size="small" style="margin-bottom:16px;">
+                <el-descriptions-item label="已删除样本"><strong style="color:var(--danger);">{{ defenseResults.removed_count||0 }}</strong> 条</el-descriptions-item>
+                <el-descriptions-item label="已重标注"><strong style="color:var(--warning);">{{ defenseResults.relabel_count||0 }}</strong> 条</el-descriptions-item>
+                <el-descriptions-item label="已忽略"><strong style="color:var(--success);">{{ defenseResults.ignored_count||0 }}</strong> 条</el-descriptions-item>
+                <el-descriptions-item label="输出文件">{{ defenseResults.output_path||'-' }}</el-descriptions-item>
+            </el-descriptions>
+            <el-button type="success" @click="downloadCleanDataset"><el-icon><download /></el-icon> 下载清洗后数据集</el-button>
+        </div>
+    </template>
+
+    <!-- 样本详情对话框 -->
+    <el-dialog v-model="showSampleDetail" title="样本详情" width="900px" destroy-on-close>
+        <template v-if="sampleDetailData">
+            <el-descriptions :column="3" border size="small" style="margin-bottom:16px;">
+                <el-descriptions-item label="样本 ID">{{ sampleDetailData.sample_id }}</el-descriptions-item>
+                <el-descriptions-item label="行索引">{{ sampleDetailData.row_index }}</el-descriptions-item>
+                <el-descriptions-item label="检测任务">{{ sampleDetailData.task_no }}</el-descriptions-item>
+            </el-descriptions>
+
+            <!-- 多检测器结果 -->
+            <div v-if="sampleDetailData.detections?.length" style="margin-bottom:16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">检测结果（{{ sampleDetailData.detections.length }} 个检测器）</div>
+                <div v-for="det in sampleDetailData.detections" :key="det.id"
+                    style="background:var(--bg-input);border-radius:6px;padding:10px;margin-bottom:6px;border-left:3px solid var(--accent);">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                        <span style="font-weight:600;color:#fff;">{{ det.detector_name }}</span>
+                        <span style="font-size:12px;" :style="{color:riskColor(det.confidence)}">{{ (det.confidence*100).toFixed(1) }}%</span>
+                    </div>
+                    <div v-if="det.reason" style="font-size:12px;color:var(--text-secondary);">{{ det.reason }}</div>
+                    <div v-if="det.triggered_features?.length" style="margin-top:4px;">
+                        <el-tag v-for="f in det.triggered_features" :key="f" size="small" style="margin:1px;" effect="dark">{{ f }}</el-tag>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据快照 -->
+            <div class="sample-detail-grid">
+                <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">原始数据</div>
+                    <div class="sample-data-table">
+                        <table v-if="Object.keys(sampleDetailData.data?.raw||{}).length">
+                            <tr v-for="(val,key) in sampleDetailData.data.raw" :key="key">
+                                <th>{{ key }}</th>
+                                <td>{{ val }}</td>
+                            </tr>
+                        </table>
+                        <div v-else style="color:var(--text-muted);text-align:center;padding:20px;">暂无原始数据</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">处理后数据</div>
+                    <div class="sample-data-table">
+                        <table v-if="Object.keys(sampleDetailData.data?.processed||{}).length">
+                            <tr v-for="(val,key) in sampleDetailData.data.processed" :key="key">
+                                <th>{{ key }}</th>
+                                <td>{{ val }}</td>
+                            </tr>
+                        </table>
+                        <div v-else style="color:var(--text-muted);text-align:center;padding:20px;">暂无处理后数据</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作历史 -->
+            <div v-if="sampleDetailData.action_history?.length" style="margin-top:16px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">操作历史</div>
+                <div v-for="h in sampleDetailData.action_history" :key="h.created_at"
+                    style="font-size:12px;color:var(--text-secondary);padding:6px 0;border-bottom:1px solid var(--border);">
+                    {{ h.operator__username }} 执行了 {{ h.action }}，{{ h.reason || '无理由' }}
+                    <span style="float:right;color:var(--text-muted);">{{ formatDate(h.created_at) }}</span>
+                </div>
+            </div>
+        </template>
+    </el-dialog>
+</div>
+
+<!-- ═══════════════════════════════════════
+     报告中心
+═══════════════════════════════════════ -->
+<div v-if="page === 'report-center'">
+    <div class="dp-card">
+        <div class="dp-card-header"><span class="dp-card-title">报告中心</span></div>
+        <div v-if="!completedTasks.length" class="empty-state">
+            <el-icon><document /></el-icon>
+            <p>暂无已完成的检测任务，无法生成报告</p>
+        </div>
+        <el-table v-else :data="completedTasks" stripe style="width:100%">
+            <el-table-column prop="task_no" label="任务编号" width="150" />
+            <el-table-column label="数据集" min-width="150">
+                <template #default="s">{{ getDatasetName(s.row.dataset) }}</template>
+            </el-table-column>
+            <el-table-column label="风险等级" width="100">
+                <template #default="s">
+                    <el-tag :type="s.row.risk_score>=0.15?'danger':s.row.risk_score>=0.05?'warning':'success'" size="small" effect="dark">{{ riskLabel(s.row.risk_score) }}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200">
+                <template #default="s">
+                    <el-button size="small" type="primary" @click="viewTask(s.row)">查看报告</el-button>
+                    <el-button size="small" type="success" @click="generateReportForTask(s.row)">生成报告</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     检测算法配置
+═══════════════════════════════════════ -->
+<div v-if="page === 'methods'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">检测算法配置</span>
+            <el-button circle size="small" @click="loadMethods"><el-icon><refresh /></el-icon></el-button>
+        </div>
+        <el-table :data="methods" stripe v-loading="loading.methods" style="width:100%">
+            <el-table-column label="算法名称" min-width="180">
+                <template #default="s">
+                    <div style="font-weight:600;color:#fff;">{{ s.row.display_name||s.row.detector_name }}</div>
+                    <div v-if="s.row.display_name&&s.row.display_name!==s.row.detector_name" style="font-size:11px;color:var(--text-muted);">{{ s.row.detector_name }}</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="算法类型" width="120">
+                <template #default="s"><el-tag :type="detectorTypeTag(s.row.detector_type)" size="small" effect="dark">{{ detectorTypeLabel(s.row.detector_type) }}</el-tag></template>
+            </el-table-column>
+            <el-table-column label="融合权重" width="90" align="center"><template #default="s">{{ s.row.weight }}</template></el-table-column>
+            <el-table-column label="状态" width="80" align="center">
+                <template #default="s"><el-tag :type="s.row.enabled?'success':'danger'" size="small" effect="dark">{{ s.row.enabled?'启用':'禁用' }}</el-tag></template>
+            </el-table-column>
+            <el-table-column label="需基准数据" width="100" align="center">
+                <template #default="s">
+                    <el-tag v-if="s.row.requires_baseline" type="warning" size="small" effect="dark">是</el-tag>
+                    <span v-else style="color:var(--text-muted);">否</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="描述" min-width="250">
+                <template #default="s"><span style="font-size:12px;color:var(--text-muted);">{{ s.row.description||'-' }}</span></template>
+            </el-table-column>
+        </el-table>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     管理后台 - 系统概览
+═══════════════════════════════════════ -->
+<div v-if="page === 'admin'">
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(59,130,246,0.15);">
+                <el-icon :size="24" color="var(--accent)"><user /></el-icon>
+            </div>
+            <div><div class="stat-value">{{ adminStats.total_users }}</div><div class="stat-label">用户总数</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(139,92,246,0.15);">
+                <el-icon :size="24" color="var(--purple)"><folder /></el-icon>
+            </div>
+            <div><div class="stat-value">{{ adminStats.total_datasets }}</div><div class="stat-label">数据集总数</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(6,182,212,0.15);">
+                <el-icon :size="24" color="var(--info)"><cpu /></el-icon>
+            </div>
+            <div><div class="stat-value">{{ adminStats.total_tasks }}</div><div class="stat-label">检测任务数</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.15);">
+                <el-icon :size="24" color="var(--success)"><document /></el-icon>
+            </div>
+            <div><div class="stat-value">{{ adminStats.total_reports }}</div><div class="stat-label">生成报告</div></div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="dp-card">
+            <div class="dp-card-header"><span class="dp-card-title">最近任务</span></div>
+            <div v-for="t in (adminStats.recent_tasks||[])" :key="t.task_id"
+                style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                <div>
+                    <div style="font-size:13px;color:#fff;">{{ t.task_no }}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">{{ t.dataset_name }} · {{ t.created_by }}</div>
+                </div>
+                <el-tag :type="statusType(t.status)" size="small" effect="dark">{{ statusLabel(t.status) }}</el-tag>
+            </div>
+            <div v-if="!adminStats.recent_tasks?.length" style="text-align:center;padding:20px 0;color:var(--text-muted);">暂无任务</div>
+        </div>
+        <div class="dp-card">
+            <div class="dp-card-header"><span class="dp-card-title">最近审计日志</span></div>
+            <div v-for="log in (adminStats.recent_logs||[])" :key="log.id"
+                style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                <div>
+                    <div style="font-size:13px;color:#fff;">{{ log.username }}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">{{ log.detail }}</div>
+                </div>
+                <el-tag size="small" effect="dark">{{ log.action }}</el-tag>
+            </div>
+            <div v-if="!adminStats.recent_logs?.length" style="text-align:center;padding:20px 0;color:var(--text-muted);">暂无日志</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     用户管理
+═══════════════════════════════════════ -->
+<div v-if="page === 'users'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">用户管理</span>
+            <el-button circle size="small" @click="loadAdminUsers"><el-icon><refresh /></el-icon></el-button>
+        </div>
+        <el-table :data="adminUsers" stripe v-loading="loading.adminUsers" style="width:100%">
+            <el-table-column prop="username" label="用户名" width="120" />
+            <el-table-column prop="email" label="邮箱" min-width="180" />
+            <el-table-column label="角色" width="100">
+                <template #default="s">
+                    <el-tag :type="s.row.is_superuser?'danger':s.row.is_staff?'warning':'info'" size="small" effect="dark">
+                        {{ s.row.is_superuser?'超级管理员':s.row.is_staff?'管理员':s.row.role }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" width="80" align="center">
+                <template #default="s">
+                    <el-tag :type="s.row.is_active?'success':'danger'" size="small" effect="dark">{{ s.row.is_active?'正常':'禁用' }}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="注册时间" width="160">
+                <template #default="s">{{ formatDate(s.row.date_joined) }}</template>
+            </el-table-column>
+            <el-table-column label="最后登录" width="160">
+                <template #default="s">{{ formatDate(s.row.last_login) }}</template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" fixed="right">
+                <template #default="s">
+                    <el-button v-if="!s.row.is_superuser" size="small" :type="s.row.is_active?'danger':'success'" plain
+                        @click="toggleUser(s.row)">{{ s.row.is_active?'禁用':'启用' }}</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     审计日志
+═══════════════════════════════════════ -->
+<div v-if="page === 'logs'">
+    <div class="dp-card">
+        <div class="dp-card-header">
+            <span class="dp-card-title">审计日志</span>
+            <div style="display:flex;gap:8px;">
+                <el-select v-model="logFilter.action" placeholder="操作类型" clearable size="small" style="width:120px;" @change="loadAuditLogs">
+                    <el-option label="登录" value="login" />
+                    <el-option label="上传" value="upload" />
+                    <el-option label="删除" value="delete" />
+                    <el-option label="检测" value="detect" />
+                    <el-option label="无害化" value="defense" />
+                    <el-option label="导出" value="export" />
+                </el-select>
+                <el-input v-model="logFilter.user" placeholder="用户名" clearable size="small" style="width:120px;"
+                    @keyup.enter="loadAuditLogs" @clear="loadAuditLogs" />
+                <el-button circle size="small" @click="loadAuditLogs"><el-icon><refresh /></el-icon></el-button>
+            </div>
+        </div>
+        <el-table :data="auditLogs" stripe v-loading="loading.logs" style="width:100%">
+            <el-table-column prop="username" label="用户" width="100" />
+            <el-table-column label="操作" width="80">
+                <template #default="s"><el-tag size="small" effect="dark">{{ s.row.action }}</el-tag></template>
+            </el-table-column>
+            <el-table-column prop="detail" label="详情" min-width="300" show-overflow-tooltip />
+            <el-table-column prop="ip_address" label="IP 地址" width="130" />
+            <el-table-column label="时间" width="160">
+                <template #default="s">{{ formatDate(s.row.created_at) }}</template>
+            </el-table-column>
+        </el-table>
+        <div v-if="auditLogTotal>auditPageSize" style="margin-top:16px;display:flex;justify-content:center;">
+            <el-pagination background layout="prev, pager, next" :total="auditLogTotal"
+                :page-size="auditPageSize" v-model:current-page="auditLogPage" @current-change="loadAuditLogs" />
+        </div>
+    </div>
+</div>
+
+        </div><!-- /main-content -->
+    </div><!-- /main-area -->
+</div><!-- /app-layout -->
+
+</div><!-- /#app -->
+{% endverbatim %}
+
+<script src="/static/js/vendor/vue.global.prod.js"></script>
+<script src="/static/js/vendor/index.full.min.js"></script>
+<script src="/static/js/vendor/icons.iife.min.js"></script>
+<script src="/static/js/app.js?v=12"></script>
+</body>
+</html>

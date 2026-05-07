@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+<meta charset="utf-8">
+<title>DPDS 检测报告 - T202605068B495011</title>
+<style>
+  body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 40px; color: #333; line-height: 1.6; }
+  h1 { color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 12px; }
+  h2 { color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-top: 32px; }
+  h3 { color: #444; margin-top: 20px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #f5f5f5; font-weight: 600; }
+  .high { color: #d32f2f; font-weight: bold; }
+  .medium { color: #f57c00; }
+  .low { color: #388e3c; }
+  .conclusion-box { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 16px 0; border-left: 5px solid #f57c00; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+  .stat-card { background: #f8f9fa; border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: bold; color: #1a73e8; }
+  .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
+  .method-card { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #409eff; }
+  .meta { color: #999; font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<h1>数据投毒检测报告</h1>
+
+<h2>1. 概览</h2>
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-value">43</div>
+    <div class="stat-label">可疑样本数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:#f57c00;">12.8%</div>
+    <div class="stat-label">综合风险分数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:#f57c00;font-size:20px;">中风险</div>
+    <div class="stat-label">风险等级</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">150</div>
+    <div class="stat-label">数据集样本总数</div>
+  </div>
+</div>
+
+<div class="conclusion-box">
+  <div style="font-size:18px;font-weight:bold;color:#f57c00;margin-bottom:8px;">
+    ⚡ 中风险 — 检测结论
+  </div>
+  <p style="margin:0;">该数据集存在中等数据投毒风险
+  （综合风险分数 12.8%），共发现 43 个可疑样本
+  （约占 28.7%）。</p>
+</div>
+
+<h2>2. 数据集信息</h2>
+<table>
+  <tr><th>数据集名称</th><td>celery_test</td></tr>
+  <tr><th>数据类型</th><td>csv</td></tr>
+  <tr><th>样本总数</th><td>150</td></tr>
+  <tr><th>标签字段</th><td>label</td></tr>
+  <tr><th>任务编号</th><td>T202605068B495011</td></tr>
+  <tr><th>完成时间</th><td>2026-05-06 12:56:04</td></tr>
+</table>
+
+<h2>3. 风险评分分解</h2>
+<p>综合风险分数由各检测器类型的可疑比例加权求和得到，公式：<code>risk_score = Σ(weight × ratio)</code></p>
+<table>
+  <tr><th>风险类型</th><th>权重</th><th>可疑比例</th><th>贡献值</th><th>可疑样本数</th></tr>
+  <tr><td>标签投毒</td><td>0.30</td><td>28.67%</td><td><strong>8.60%</strong></td><td>43</td></tr>
+
+  <tr style="background:#f0f0f0;font-weight:bold;">
+    <td>合计</td><td>-</td><td>-<td>12.76%</td><td>43</td>
+  </tr>
+</table>
+
+<h2>4. 检测方法说明</h2>
+<p>本次检测使用了以下 1 种检测算法：</p>
+<div class="method-card"><strong>Cleanlab 标签投毒检测</strong>（标签投毒）<br><span style="color:#555;">通过训练逻辑回归分类器，对比每个样本的真实标签与模型预测标签的置信度差异来识别误标样本。</span></div>
+
+<h2>5. 各检测器分析结果</h2>
+<table>
+  <tr><th>检测器</th><th>类型</th><th>可疑/总数</th><th>可疑比例</th><th>平均置信度</th><th>最高置信度</th></tr>
+  <tr><td><strong>Cleanlab 标签投毒检测</strong></td><td>标签投毒</td><td>43 / 150</td><td>28.7%</td><td>52.3%</td><td>100.0%</td></tr>
+
+</table>
+
+        <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #409eff;">
+          <h4 style="margin:0 0 8px;color:#1a73e8;">Cleanlab 标签投毒检测 <span style="font-size:12px;color:#666;">(标签投毒)</span></h4>
+          <p style="color:#555;font-size:13px;margin:0 0 8px;"><strong>检测原理：</strong>通过训练逻辑回归分类器，对比每个样本的真实标签与模型预测标签的置信度差异来识别误标样本。</p>
+          <p style="color:#333;font-size:13px;margin:0 0 8px;"><strong>分析发现：</strong>发现 43 个可疑样本，平均置信度 52.3%，最高 100.0%。主要风险类型：标签投毒（29 条）。</p>
+          <div style="display:flex;gap:20px;font-size:12px;color:#666;">
+            <span>风险类型：后门攻击(5)、异常样本(9)、标签投毒(29)</span>
+            <span>处理建议：人工复查(14)、建议重标(29)</span>
+          </div>
+        </div>
+
+<h2>6. 置信度统计</h2>
+<table>
+  <tr><th>统计指标</th><th>值</th></tr>
+  <tr><td>平均置信度</td><td><strong>52.3%</strong></td></tr>
+  <tr><td>标准差</td><td>22.0%</td></tr>
+  <tr><td>最低置信度</td><td>31.6%</td></tr>
+  <tr><td>最高置信度</td><td>100.0%</td></tr>
+  <tr><td>高置信度（≥80%）样本数</td><td class="high">7</td></tr>
+  <tr><td>中置信度（50%-80%）样本数</td><td class="medium">7</td></tr>
+  <tr><td>低置信度（＜50%）样本数</td><td>29</td></tr>
+</table>
+
+<h2>7. 处理建议分布</h2>
+<table>
+  <tr><th>建议类型</th><th>数量</th><th>占比</th></tr>
+  <tr><td>建议重标</td><td><strong>29</strong></td><td>67.4%</td></tr>
+<tr><td>人工复查</td><td><strong>14</strong></td><td>32.6%</td></tr>
+
+</table>
+
+<h2>8. 高风险样本（Top 20）</h2>
+<table>
+  <tr><th>样本 ID</th><th>风险类型</th><th>置信度</th><th>处理建议</th><th>检测器</th></tr>
+  <tr><td>S-000030</td><td>后门攻击</td><td class="high">100.0%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000040</td><td>异常样本</td><td class="high">100.0%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000057</td><td>异常样本</td><td class="high">100.0%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000122</td><td>异常样本</td><td class="high">97.4%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000084</td><td>异常样本</td><td class="high">86.8%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000000</td><td>异常样本</td><td class="high">84.6%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000129</td><td>异常样本</td><td class="high">81.9%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000080</td><td>异常样本</td><td class="medium">76.5%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000135</td><td>后门攻击</td><td class="medium">73.9%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000126</td><td>后门攻击</td><td class="medium">73.5%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000143</td><td>后门攻击</td><td class="medium">72.5%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000001</td><td>异常样本</td><td class="medium">68.4%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000028</td><td>后门攻击</td><td class="medium">68.1%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000106</td><td>异常样本</td><td class="medium">65.7%</td><td>人工复查</td><td>cleanlab</td></tr>
+<tr><td>S-000069</td><td>标签投毒</td><td class="">49.5%</td><td>建议重标</td><td>cleanlab</td></tr>
+<tr><td>S-000051</td><td>标签投毒</td><td class="">40.4%</td><td>建议重标</td><td>cleanlab</td></tr>
+<tr><td>S-000011</td><td>标签投毒</td><td class="">40.2%</td><td>建议重标</td><td>cleanlab</td></tr>
+<tr><td>S-000074</td><td>标签投毒</td><td class="">39.8%</td><td>建议重标</td><td>cleanlab</td></tr>
+<tr><td>S-000077</td><td>标签投毒</td><td class="">39.7%</td><td>建议重标</td><td>cleanlab</td></tr>
+<tr><td>S-000014</td><td>标签投毒</td><td class="">39.5%</td><td>建议重标</td><td>cleanlab</td></tr>
+
+</table>
+
+
+
+<h2>9. 综合结论与建议</h2>
+<div class="conclusion-box">
+  <h3 style="margin-top:0;">行动建议</h3>
+  <ol style="margin:0;padding-left:20px;">
+    <li>建议对 7 个高置信度（≥80%）可疑样本执行删除操作</li><li>建议对 29 个标签投毒样本进行人工复核并重新标注</li><li>建议对 14 个待复查样本进行人工审查确认</li>
+  </ol>
+</div>
+
+<p class="meta">
+  报告生成时间：2026-05-06 20:56:54 | DPDS 数据投毒检测系统<br>
+  本报告基于自动化检测算法生成，建议结合人工审查做出最终决策。
+</p>
+</body>
+</html>

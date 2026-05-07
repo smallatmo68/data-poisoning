@@ -1,0 +1,5 @@
+{
+  "name": "vit",
+  "trainable_layers": [],
+  "random_seed": 42
+}

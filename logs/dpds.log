@@ -1,0 +1,129 @@
+[2026-04-26 15:43:51,670] INFO dpds.detection: [thread] 开始执行检测任务 94b7ccf6-8576-4095-8510-4ae71cc1033f
+[2026-04-26 15:43:51,670] INFO dpds.detection: 已启动检测线程，任务 94b7ccf6-8576-4095-8510-4ae71cc1033f
+[2026-04-26 15:43:55,077] INFO dpds.detection: [thread] 开始执行检测任务 b3caa6cb-72a1-4133-90ad-58d8bde71e6f
+[2026-04-26 15:43:55,077] INFO dpds.detection: 已启动检测线程，任务 b3caa6cb-72a1-4133-90ad-58d8bde71e6f
+[2026-04-26 15:43:55,866] INFO dpds.detection: [thread] 检测任务 94b7ccf6-8576-4095-8510-4ae71cc1033f 完成
+[2026-04-26 15:43:57,674] INFO dpds.detection: [thread] 检测任务 b3caa6cb-72a1-4133-90ad-58d8bde71e6f 完成
+[2026-04-26 22:46:30,585] INFO dpds.detection: [thread] 开始执行检测任务 5ddb6f7e-cb79-448d-bb7c-bc59680c33bd
+[2026-04-26 22:46:30,586] INFO dpds.detection: 已启动检测线程，任务 5ddb6f7e-cb79-448d-bb7c-bc59680c33bd
+[2026-04-26 22:46:31,679] INFO dpds.detection: [thread] 开始执行检测任务 8619b3f4-f892-4564-886d-d40fa4f4db6f
+[2026-04-26 22:46:31,679] INFO dpds.detection: 已启动检测线程，任务 8619b3f4-f892-4564-886d-d40fa4f4db6f
+[2026-04-26 22:46:32,147] INFO dpds.detection: [thread] 开始执行检测任务 d9ab4c88-d831-497d-9b1e-5374b7caf8e2
+[2026-04-26 22:46:32,148] INFO dpds.detection: 已启动检测线程，任务 d9ab4c88-d831-497d-9b1e-5374b7caf8e2
+[2026-04-26 22:46:37,722] INFO dpds.detection: [thread] 检测任务 d9ab4c88-d831-497d-9b1e-5374b7caf8e2 完成
+[2026-04-26 22:46:38,005] INFO dpds.detection: [thread] 检测任务 5ddb6f7e-cb79-448d-bb7c-bc59680c33bd 完成
+[2026-04-26 22:46:38,247] INFO dpds.detection: [thread] 检测任务 8619b3f4-f892-4564-886d-d40fa4f4db6f 完成
+[2026-04-27 07:46:38,244] INFO dpds.detection: [thread] 开始执行检测任务 14f8163b-c096-4802-9436-1edf36441796
+[2026-04-27 07:46:38,246] INFO dpds.detection: 已启动检测线程，任务 14f8163b-c096-4802-9436-1edf36441796
+[2026-04-27 07:46:38,662] INFO dpds.detection: [thread] 开始执行检测任务 cef0c47c-85b4-4049-b2ca-f8a1983f3b48
+[2026-04-27 07:46:38,663] INFO dpds.detection: 已启动检测线程，任务 cef0c47c-85b4-4049-b2ca-f8a1983f3b48
+[2026-04-27 07:46:39,062] INFO dpds.detection: [thread] 开始执行检测任务 9d618351-d15d-4182-8fbb-02cc7b5186e9
+[2026-04-27 07:46:39,062] INFO dpds.detection: 已启动检测线程，任务 9d618351-d15d-4182-8fbb-02cc7b5186e9
+[2026-04-27 07:46:45,083] INFO dpds.detection: [thread] 检测任务 cef0c47c-85b4-4049-b2ca-f8a1983f3b48 完成
+[2026-04-27 07:46:45,193] INFO dpds.detection: [thread] 检测任务 14f8163b-c096-4802-9436-1edf36441796 完成
+[2026-04-27 07:46:45,356] INFO dpds.detection: [thread] 检测任务 9d618351-d15d-4182-8fbb-02cc7b5186e9 完成
+[2026-05-01 13:05:39,884] INFO dpds.detection: [thread] 开始执行检测任务 4c102c46-bd65-4045-98c9-4f6f2740a504
+[2026-05-01 13:05:39,884] INFO dpds.detection: 已启动检测线程，任务 4c102c46-bd65-4045-98c9-4f6f2740a504
+[2026-05-01 13:05:44,704] INFO dpds.detection: [thread] 检测任务 4c102c46-bd65-4045-98c9-4f6f2740a504 完成
+[2026-05-01 17:13:57,449] INFO dpds.detection: 开始检测任务 746c55d4-4083-417b-aa8a-d7bf2bfbbaea
+[2026-05-01 17:13:57,452] ERROR dpds.detection: DetectionTask 746c55d4-4083-417b-aa8a-d7bf2bfbbaea 不存在
+[2026-05-01 17:13:57,457] INFO dpds.detection: 开始检测任务 9bba876c-8b74-4964-9c93-19fe791935a4
+[2026-05-01 17:13:57,458] ERROR dpds.detection: DetectionTask 9bba876c-8b74-4964-9c93-19fe791935a4 不存在
+[2026-05-01 17:13:57,461] INFO dpds.preprocessing: 开始预处理任务 4bbcfc07-21e7-4eaa-87cd-1a258d4f3346
+[2026-05-01 17:13:57,481] INFO dpds.preprocessing: 开始预处理任务 1c35661a-6c21-4f35-b572-ad3561f5fd79
+[2026-05-01 17:16:32,438] INFO dpds.preprocessing: 开始预处理任务 5be21658-152b-42b1-8dbd-ea831c0ebb71
+[2026-05-01 17:16:33,467] INFO dpds.detection: 已提交 Celery 检测任务 d433a36d-0003-4263-b1c3-4520556d5817
+[2026-05-01 17:16:33,468] INFO dpds.detection: 开始检测任务 d433a36d-0003-4263-b1c3-4520556d5817
+[2026-05-01 17:30:50,878] INFO dpds.detection: 已提交 Celery 检测任务 3f1a4495-ad67-4014-b9cd-5b6f34523a53
+[2026-05-01 17:30:50,884] INFO dpds.detection: 开始检测任务 3f1a4495-ad67-4014-b9cd-5b6f34523a53
+[2026-05-01 17:51:55,357] INFO dpds.detection: 已提交 Celery 检测任务 9d3deedf-08c5-4d89-b80f-73a6703c74a3
+[2026-05-01 18:22:54,604] INFO dpds.detection: 已提交 Celery 检测任务 518502f0-1e8d-4e57-8fe9-94483894f7c3
+[2026-05-01 18:25:51,982] INFO dpds.detection: [thread] 开始执行检测任务 1d5081f0-73bc-44ef-9982-50541358cf0c
+[2026-05-01 18:25:51,983] INFO dpds.detection: 已启动检测线程，任务 1d5081f0-73bc-44ef-9982-50541358cf0c
+[2026-05-01 18:25:54,954] INFO dpds.detection: [thread] 检测任务 1d5081f0-73bc-44ef-9982-50541358cf0c 完成
+[2026-05-01 18:55:56,397] INFO dpds.detection: [thread] 开始执行检测任务 054eb370-1d93-44db-bc82-1ae3bbd87994
+[2026-05-01 18:55:56,397] INFO dpds.detection: 已启动检测线程，任务 054eb370-1d93-44db-bc82-1ae3bbd87994
+[2026-05-01 18:55:58,157] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.onion_adapter 失败: No module named 'algorithm_engine.detectors.legacy.onion_adapter'
+[2026-05-01 18:55:58,158] WARNING algorithm_engine: 检测器 onion 未注册
+[2026-05-01 18:55:58,159] WARNING algorithm_engine: 检测器 onion 未找到，跳过
+[2026-05-01 18:55:58,172] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.statistical_adapter 失败: No module named 'algorithm_engine.detectors.legacy.statistical_adapter'
+[2026-05-01 18:55:58,173] WARNING algorithm_engine: 检测器 statistical 未注册
+[2026-05-01 18:55:58,174] WARNING algorithm_engine: 检测器 statistical 未找到，跳过
+[2026-05-01 18:55:58,188] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.strip_adapter 失败: No module named 'algorithm_engine.detectors.legacy.strip_adapter'
+[2026-05-01 18:55:58,189] WARNING algorithm_engine: 检测器 strip 未注册
+[2026-05-01 18:55:58,190] WARNING algorithm_engine: 检测器 strip 未找到，跳过
+[2026-05-01 18:55:58,715] INFO dpds.detection: [thread] 检测任务 054eb370-1d93-44db-bc82-1ae3bbd87994 完成
+[2026-05-01 19:16:08,222] INFO dpds.detection: [thread] 开始执行检测任务 e09456b6-95fb-4ebf-b52c-543f39564cd0
+[2026-05-01 19:16:08,222] INFO dpds.detection: 已启动检测线程，任务 e09456b6-95fb-4ebf-b52c-543f39564cd0
+[2026-05-01 19:16:10,153] INFO dpds.detection: [thread] 检测任务 e09456b6-95fb-4ebf-b52c-543f39564cd0 完成
+[2026-05-01 19:24:48,297] INFO dpds.detection: [thread] 开始执行检测任务 5fd4ca86-c1ba-4ac8-91c7-e497d0535869
+[2026-05-01 19:24:48,298] INFO dpds.detection: 已启动检测线程，任务 5fd4ca86-c1ba-4ac8-91c7-e497d0535869
+[2026-05-01 19:24:52,036] INFO dpds.detection: [thread] 检测任务 5fd4ca86-c1ba-4ac8-91c7-e497d0535869 完成
+[2026-05-01 19:25:31,407] INFO dpds.detection: [thread] 开始执行检测任务 afc4e3c2-f53d-42d2-9818-fc34e84b2854
+[2026-05-01 19:25:31,407] INFO dpds.detection: 已启动检测线程，任务 afc4e3c2-f53d-42d2-9818-fc34e84b2854
+[2026-05-01 19:25:33,395] INFO dpds.detection: [thread] 检测任务 afc4e3c2-f53d-42d2-9818-fc34e84b2854 完成
+[2026-05-01 19:27:24,492] INFO dpds.detection: [thread] 开始执行检测任务 a4226a18-eae3-4aff-9b92-9eca51809e23
+[2026-05-01 19:27:24,492] INFO dpds.detection: 已启动检测线程，任务 a4226a18-eae3-4aff-9b92-9eca51809e23
+[2026-05-01 19:27:26,363] INFO dpds.detection: [thread] 检测任务 a4226a18-eae3-4aff-9b92-9eca51809e23 完成
+[2026-05-01 19:30:32,880] INFO dpds.detection: [thread] 开始执行检测任务 a0aa052e-188a-4b02-8494-b79c22251e33
+[2026-05-01 19:30:32,881] INFO dpds.detection: 已启动检测线程，任务 a0aa052e-188a-4b02-8494-b79c22251e33
+[2026-05-01 19:30:34,721] INFO dpds.detection: [thread] 检测任务 a0aa052e-188a-4b02-8494-b79c22251e33 完成
+[2026-05-01 19:34:22,987] INFO dpds.detection: [thread] 开始执行检测任务 4fba638f-7ee2-488d-a598-9cd48ad56a99
+[2026-05-01 19:34:22,987] INFO dpds.detection: 已启动检测线程，任务 4fba638f-7ee2-488d-a598-9cd48ad56a99
+[2026-05-01 19:34:24,532] INFO dpds.detection: [thread] 检测任务 4fba638f-7ee2-488d-a598-9cd48ad56a99 完成
+[2026-05-06 19:57:11,625] INFO dpds.detection: [thread] 开始执行检测任务 48e4e3ce-0af6-4576-be21-ff5e3e64e256
+[2026-05-06 19:57:11,626] INFO dpds.detection: 已启动检测线程，任务 48e4e3ce-0af6-4576-be21-ff5e3e64e256
+[2026-05-06 19:57:16,112] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.comprehensive_adapter 失败: No module named 'algorithm_engine.detectors.legacy.comprehensive_adapter'
+[2026-05-06 19:57:16,114] WARNING algorithm_engine: 检测器 comprehensive 未注册
+[2026-05-06 19:57:16,115] WARNING algorithm_engine: 检测器 comprehensive 未找到，跳过
+[2026-05-06 19:57:16,701] INFO dpds.detection: [thread] 检测任务 48e4e3ce-0af6-4576-be21-ff5e3e64e256 完成
+[2026-05-06 20:55:59,705] INFO dpds.detection: [thread] 开始执行检测任务 8b495011-97c7-44a2-a8be-ce5be7630657
+[2026-05-06 20:55:59,705] INFO dpds.detection: 已启动检测线程，任务 8b495011-97c7-44a2-a8be-ce5be7630657
+[2026-05-06 20:56:03,617] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.onion_adapter 失败: No module named 'algorithm_engine.detectors.legacy.onion_adapter'
+[2026-05-06 20:56:03,619] WARNING algorithm_engine: 检测器 onion 未注册
+[2026-05-06 20:56:03,620] WARNING algorithm_engine: 检测器 onion 未找到，跳过
+[2026-05-06 20:56:03,642] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.statistical_adapter 失败: No module named 'algorithm_engine.detectors.legacy.statistical_adapter'
+[2026-05-06 20:56:03,643] WARNING algorithm_engine: 检测器 statistical 未注册
+[2026-05-06 20:56:03,646] WARNING algorithm_engine: 检测器 statistical 未找到，跳过
+[2026-05-06 20:56:03,663] WARNING algorithm_engine: 加载检测器模块 algorithm_engine.detectors.legacy.strip_adapter 失败: No module named 'algorithm_engine.detectors.legacy.strip_adapter'
+[2026-05-06 20:56:03,665] WARNING algorithm_engine: 检测器 strip 未注册
+[2026-05-06 20:56:03,666] WARNING algorithm_engine: 检测器 strip 未找到，跳过
+[2026-05-06 20:56:04,227] INFO dpds.detection: [thread] 检测任务 8b495011-97c7-44a2-a8be-ce5be7630657 完成
+[2026-05-06 20:59:31,272] INFO dpds.datasets: 自动预处理已创建: dataset=7bb3a000-94e0-47e9-839f-31a0a854544b, preprocess=0a3a59ca-06a8-403d-bb74-6d6c45c4a064
+[2026-05-06 20:59:31,360] INFO dpds.datasets: 自动预处理完成: dataset=7bb3a000-94e0-47e9-839f-31a0a854544b
+[2026-05-06 21:04:26,286] INFO dpds.datasets: 自动预处理已创建: dataset=0824ddb8-7b45-4b9b-94df-b0c905223d18, preprocess=d5c6c11f-87e2-4e53-a0fc-5134d903772e
+[2026-05-06 21:04:26,367] INFO dpds.datasets: 自动预处理完成: dataset=0824ddb8-7b45-4b9b-94df-b0c905223d18
+[2026-05-06 21:04:31,088] INFO dpds.detection: [thread] 开始执行检测任务 276ffbc6-c7e3-418a-85a3-ee8a32ba88fc
+[2026-05-06 21:04:31,088] INFO dpds.detection: 已启动检测线程，任务 276ffbc6-c7e3-418a-85a3-ee8a32ba88fc
+[2026-05-06 21:04:34,922] INFO dpds.detection: [thread] 检测任务 276ffbc6-c7e3-418a-85a3-ee8a32ba88fc 完成
+[2026-05-06 22:09:11,078] INFO dpds.detection: [thread] 开始执行检测任务 75bb9fce-3d61-4539-a831-8ac6ee4ed100
+[2026-05-06 22:09:11,079] INFO dpds.detection: 已启动检测线程，任务 75bb9fce-3d61-4539-a831-8ac6ee4ed100
+[2026-05-06 22:09:11,343] INFO dpds.detection: [thread] 检测任务 75bb9fce-3d61-4539-a831-8ac6ee4ed100 完成
+[2026-05-06 22:19:34,988] INFO dpds.datasets: 自动预处理已创建: dataset=53bc7b4f-732c-4c79-ac7d-754780900b36, preprocess=3edd6e08-af2e-449a-9843-5e2846a5803c
+[2026-05-06 22:19:35,347] INFO dpds.datasets: 自动预处理完成: dataset=53bc7b4f-732c-4c79-ac7d-754780900b36
+[2026-05-06 22:19:46,269] INFO dpds.detection: [thread] 开始执行检测任务 fb66d2f9-9bbc-4d53-842b-875187471c7b
+[2026-05-06 22:19:46,269] INFO dpds.detection: 已启动检测线程，任务 fb66d2f9-9bbc-4d53-842b-875187471c7b
+[2026-05-06 22:23:00,441] ERROR algorithm_engine: [strip] 检测失败: 数据集没有数值特征列，无法执行 STRIP 检测
+Traceback (most recent call last):
+  File "D:\AAAXuexi-----study\software\Open-source Data Poisoning\algorithm_engine\base.py", line 57, in safe_run
+    return self.run(dataset, baseline_dataset, config)
+  File "D:\AAAXuexi-----study\software\Open-source Data Poisoning\algorithm_engine\detectors\legacy\strip_adapter.py", line 46, in run
+    raise ValueError('数据集没有数值特征列，无法执行 STRIP 检测')
+ValueError: 数据集没有数值特征列，无法执行 STRIP 检测
+[2026-05-06 22:23:01,950] INFO dpds.detection: [thread] 检测任务 fb66d2f9-9bbc-4d53-842b-875187471c7b 完成
+[2026-05-06 22:47:23,067] INFO dpds.detection: [thread] 开始执行检测任务 caf0754b-d693-4599-be18-d25792f9e3dd
+[2026-05-06 22:47:23,067] INFO dpds.detection: 已启动检测线程，任务 caf0754b-d693-4599-be18-d25792f9e3dd
+[2026-05-06 22:47:23,536] ERROR algorithm_engine: [strip] 检测失败: 数据集没有数值特征列，无法执行 STRIP 检测
+Traceback (most recent call last):
+  File "D:\AAAXuexi-----study\software\Open-source Data Poisoning\algorithm_engine\base.py", line 57, in safe_run
+    return self.run(dataset, baseline_dataset, config)
+  File "D:\AAAXuexi-----study\software\Open-source Data Poisoning\algorithm_engine\detectors\legacy\strip_adapter.py", line 46, in run
+    raise ValueError('数据集没有数值特征列，无法执行 STRIP 检测')
+ValueError: 数据集没有数值特征列，无法执行 STRIP 检测
+[2026-05-06 22:47:23,731] WARNING dpds.detection: 任务 caf0754b-d693-4599-be18-d25792f9e3dd 部分检测器失败: 1/3
+[2026-05-06 22:47:23,735] INFO dpds.detection: [thread] 检测任务 caf0754b-d693-4599-be18-d25792f9e3dd 完成
+[2026-05-06 22:47:41,445] INFO dpds.llm_report: 调用 DeepSeek API 生成报告: task=T20260506CAF0754B, model=deepseek-v4-flash
+[2026-05-06 22:47:59,148] INFO dpds.llm_report: DeepSeek API 调用成功: task=T20260506CAF0754B, tokens={'prompt_tokens': 728, 'completion_tokens': 1094, 'total_tokens': 1822, 'prompt_tokens_details': {'cached_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 177}, 'prompt_cache_hit_tokens': 0, 'prompt_cache_miss_tokens': 728}
+[2026-05-06 23:04:08,289] INFO dpds.detection: [thread] 开始执行检测任务 4f129692-e20e-4b84-9240-3fa295323d49
+[2026-05-06 23:04:08,292] INFO dpds.detection: 已启动检测线程，任务 4f129692-e20e-4b84-9240-3fa295323d49
+[2026-05-06 23:04:11,855] INFO dpds.detection: [thread] 检测任务 4f129692-e20e-4b84-9240-3fa295323d49 完成

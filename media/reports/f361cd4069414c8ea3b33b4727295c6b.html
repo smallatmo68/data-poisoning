@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+<meta charset="utf-8">
+<title>DPDS 检测报告 - T202605014C10</title>
+<style>
+  body { font-family: 'Microsoft YaHei', sans-serif; margin: 40px; color: #333; }
+  h1 { color: #1a73e8; } h2 { color: #555; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #f5f5f5; }
+  .high { color: #d32f2f; font-weight: bold; }
+  .medium { color: #f57c00; }
+  .low { color: #388e3c; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>数据投毒检测报告</h1>
+
+<h2>1. 数据集基本信息</h2>
+<table>
+  <tr><th>数据集名称</th><td>test_poisoned</td></tr>
+  <tr><th>数据类型</th><td>csv</td></tr>
+  <tr><th>样本总数</th><td>200</td></tr>
+  <tr><th>标签字段</th><td>label</td></tr>
+</table>
+
+<h2>2. 检测任务信息</h2>
+<table>
+  <tr><th>任务编号</th><td>T202605014C10</td></tr>
+  <tr><th>任务状态</th><td>success</td></tr>
+  <tr><th>创建时间</th><td>2026-05-01 05:05:39</td></tr>
+  <tr><th>完成时间</th><td>2026-05-01 05:05:44</td></tr>
+</table>
+
+<h2>3. 风险统计</h2>
+<table>
+  <tr><th>综合风险分数</th><td class="high">0.2833</td></tr>
+  <tr><th>风险等级</th><td class="high">高风险</td></tr>
+  <tr><th>可疑样本数</th><td>74</td></tr>
+</table>
+
+<h2>4. 检测器结果摘要</h2>
+<table>
+  <tr><th>检测器</th><th>类型</th><th>状态</th><th>风险等级</th><th>可疑样本数</th></tr>
+  <tr><td>cleanlab</td><td>label_poison</td><td>success</td><td>-</td><td>74</td></tr>
+
+</table>
+
+<h2>5. 高风险样本列表（Top 20）</h2>
+<table>
+  <tr><th>样本 ID</th><th>风险类型</th><th>置信度</th><th>处理建议</th><th>检测器</th></tr>
+  <tr><td>S-000041</td><td>anomaly</td><td>1.0000</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000168</td><td>anomaly</td><td>0.9468</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000152</td><td>anomaly</td><td>0.9312</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000039</td><td>anomaly</td><td>0.8463</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000096</td><td>anomaly</td><td>0.8333</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000071</td><td>anomaly</td><td>0.8133</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000009</td><td>anomaly</td><td>0.7552</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000020</td><td>anomaly</td><td>0.6987</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000062</td><td>anomaly</td><td>0.6241</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000078</td><td>anomaly</td><td>0.6060</td><td>review</td><td>cleanlab</td></tr>
+<tr><td>S-000174</td><td>label_poison</td><td>0.4977</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000176</td><td>label_poison</td><td>0.4865</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000077</td><td>label_poison</td><td>0.4852</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000050</td><td>label_poison</td><td>0.4768</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000142</td><td>label_poison</td><td>0.4740</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000188</td><td>label_poison</td><td>0.4731</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000021</td><td>label_poison</td><td>0.4692</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000158</td><td>label_poison</td><td>0.4656</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000023</td><td>label_poison</td><td>0.4623</td><td>relabel</td><td>cleanlab</td></tr>
+<tr><td>S-000014</td><td>label_poison</td><td>0.4482</td><td>relabel</td><td>cleanlab</td></tr>
+
+</table>
+
+<h2>6. 无害化处理建议</h2>
+<p>建议对置信度 &gt; 0.8 的样本执行 <b>删除（remove）</b> 操作，对 0.5~0.8 之间的样本进行 <b>人工复查（review）</b>。</p>
+<table>
+  <tr><th>删除样本数</th><td>74</td></tr>
+  <tr><th>重新标注数</th><td>0</td></tr>
+  <tr><th>忽略样本数</th><td>0</td></tr>
+  <tr><th>净化数据集路径</th><td>D:\AAAXuexi-----study\software\Open-source Data Poisoning\media\clean\48f8a4fdd2d640ceac36130c0b76985f_clean.csv</td></tr>
+</table>
+
+<p style="color: #999; margin-top: 40px; font-size: 12px;">
+  报告生成时间：2026-05-01 13:06:39 | DPDS 数据投毒检测系统
+</p>
+</body>
+</html>

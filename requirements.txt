@@ -1,0 +1,8 @@
+# ============================================================
+# requirements.txt — 完整依赖 (base + 核心算法)
+# 快速安装: pip install -r requirements.txt
+# ============================================================
+-r requirements-base.txt
+
+# 如需完整算法支持（cleanlab/opencv 等），另行安装:
+# pip install -r requirements-algorithms.txt

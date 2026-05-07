@@ -1,0 +1,30 @@
+# ============================================================
+# requirements-algorithms.txt — ML 算法依赖（可选，重依赖）
+# 说明: 这些依赖体积大或版本敏感，系统使用 optional import。
+#       如果某依赖缺失，对应检测器会返回 detector_status=dependency_missing
+#       不会导致 Django 启动失败。
+# 安装: pip install -r requirements-algorithms.txt
+# ============================================================
+
+# Cleanlab — 标签投毒检测 (Confident Learning)
+cleanlab>=2.5.0
+
+# 图像处理扩展
+opencv-python>=4.8.0
+
+# NLP / 文本特征（可选，较重）
+# sentence-transformers>=2.2.0
+
+# PyTorch（可选，图像后门检测需要）
+# 建议单独通过 conda 安装对应 CUDA 版本:
+#   conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+# 或 CPU 版本:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Transformers（可选）
+# transformers>=4.35.0
+
+# 深度学习可解释性（可选）
+# captum>=0.6.0

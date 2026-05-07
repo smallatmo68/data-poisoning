@@ -1,0 +1,15 @@
+[
+  {
+    "error": "mislabelled_uniform",
+    "contamination": 0.1,
+    "seed": 0
+  },
+    {
+    "error": "unsupervised_anomalies",
+    "contamination": 0.1,
+    "seed": 2,
+      "params": {
+        "ood_data_name": "mnist"
+      }
+  }
+]

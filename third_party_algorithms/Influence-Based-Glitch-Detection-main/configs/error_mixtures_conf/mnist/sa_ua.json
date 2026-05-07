@@ -1,0 +1,15 @@
+[
+  {
+    "error": "supervised_anomalies",
+    "contamination": 0.01,
+    "seed": 1
+  },
+    {
+    "error": "unsupervised_anomalies",
+    "contamination": 0.01,
+    "seed": 2,
+      "params": {
+        "ood_data_name": "fmnist"
+      }
+  }
+]
